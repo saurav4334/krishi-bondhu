@@ -64,12 +64,4 @@ class User extends Authenticatable
             default => '🧑‍🌾 কৃষক',
         };
     }
-
-    /**
-     * Tells Laravel to use 'mobile' as the username for login
-     */
-    public function getAuthIdentifierName()
-    {
-        return 'mobile';
-    }
 }

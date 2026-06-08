@@ -4,8 +4,11 @@ namespace Database\Seeders;
 
 use App\Models\CropPost;
 use App\Models\Expert;
+use App\Models\LaborJobPost;
+use App\Models\LaborWorker;
 use App\Models\MarketPrice;
 use App\Models\Notification;
+use App\Models\TransportProvider;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -137,6 +140,39 @@ class DatabaseSeeder extends Seeder
             'message' => 'প্ল্যাটফর্মে নতুন কৃষি বিশেষজ্ঞ যোগ দিয়েছেন।',
             'user_type' => 'all',
         ]);
+
+        // --- Labor Workers ---
+        $workers = [
+            ['name' => 'করিম শেখ', 'mobile' => '01710000001', 'district' => 'ময়মনসিংহ', 'area' => 'ত্রিশাল', 'skill_type' => 'ধান কাটার শ্রমিক', 'daily_wage' => 700, 'experience' => '৮ বছর', 'availability_status' => 'available'],
+            ['name' => 'জসিম উদ্দিন', 'mobile' => '01710000002', 'district' => 'বগুড়া', 'area' => 'শেরপুর', 'skill_type' => 'স্প্রে শ্রমিক', 'daily_wage' => 600, 'experience' => '৫ বছর', 'availability_status' => 'available'],
+            ['name' => 'রফিক মিয়া', 'mobile' => '01710000003', 'district' => 'রংপুর', 'area' => 'মিঠাপুকুর', 'skill_type' => 'জমি প্রস্তুত শ্রমিক', 'daily_wage' => 800, 'experience' => '১০ বছর', 'availability_status' => 'busy'],
+            ['name' => 'সেলিম হোসেন', 'mobile' => '01710000004', 'district' => 'রাজশাহী', 'area' => 'পবা', 'skill_type' => 'সবজি শ্রমিক', 'daily_wage' => 550, 'experience' => '৩ বছর', 'availability_status' => 'available'],
+        ];
+        foreach ($workers as $w) {
+            LaborWorker::create(array_merge($w, ['user_id' => $farmer->id]));
+        }
+
+        // --- Labor Job Posts ---
+        LaborJobPost::create([
+            'farmer_id' => $farmer->id,
+            'job_type' => 'ধান কাটার শ্রমিক',
+            'location' => 'ময়মনসিংহ, ত্রিশাল',
+            'worker_needed' => 5,
+            'wage' => 750,
+            'duration' => '৩ দিন',
+            'contact_number' => '01712345678',
+            'status' => 'open',
+        ]);
+
+        // --- Transport Providers ---
+        $providers = [
+            ['driver_name' => 'আব্দুল হক', 'mobile' => '01720000001', 'vehicle_type' => 'পিকআপ ভ্যান', 'vehicle_number' => 'ঢাকা মেট্রো-১১', 'district' => 'ঢাকা', 'service_area' => 'ঢাকা - ময়মনসিংহ', 'rate_per_km' => 35, 'availability_status' => 'available'],
+            ['driver_name' => 'সোহেল রানা', 'mobile' => '01720000002', 'vehicle_type' => 'মিনি ট্রাক', 'vehicle_number' => 'রাজ-১২৩৪', 'district' => 'রাজশাহী', 'service_area' => 'উত্তরবঙ্গ', 'rate_per_km' => 45, 'availability_status' => 'available'],
+            ['driver_name' => 'নয়ন মিয়া', 'mobile' => '01720000003', 'vehicle_type' => 'ট্রাক্টর', 'vehicle_number' => null, 'district' => 'বগুড়া', 'service_area' => 'বগুড়া সদর', 'rate_per_km' => 60, 'availability_status' => 'busy'],
+        ];
+        foreach ($providers as $p) {
+            TransportProvider::create(array_merge($p, ['user_id' => $farmer->id]));
+        }
 
         $this->command->info('');
         $this->command->info('✅ Demo data seeded successfully!');
