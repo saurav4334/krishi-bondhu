@@ -60,7 +60,7 @@
         </div>
 
         <div class="form-group">
-            <label>প্রোফাইল ছবি (ঐচ্ছিক, সর্বোচ্চ ২MB)</label>
+            <label>প্রোফাইল ছবি (ঐচ্ছিক, সর্বোচ্চ ১০MB)</label>
             <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style="padding: 6px;">
         </div>
 

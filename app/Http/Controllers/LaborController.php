@@ -61,7 +61,7 @@ class LaborController extends Controller
             'daily_wage' => ['required', 'numeric', 'min:1'],
             'experience' => ['nullable', 'string', 'max:50'],
             'availability_status' => ['required', 'in:available,busy'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:10240'],
         ], [
             'name.required' => 'নাম দিন',
             'mobile.required' => 'মোবাইল নম্বর দিন',
@@ -71,7 +71,7 @@ class LaborController extends Controller
             'daily_wage.required' => 'দৈনিক মজুরি দিন',
             'daily_wage.numeric' => 'সঠিক মজুরি দিন',
             'image.image' => 'শুধুমাত্র ছবি আপলোড করুন',
-            'image.max' => 'ছবির আকার সর্বোচ্চ ২MB',
+            'image.max' => 'ছবির আকার সর্বোচ্চ ১০MB',
         ]);
 
         if ($request->hasFile('image')) {

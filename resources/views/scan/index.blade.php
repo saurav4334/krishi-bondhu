@@ -39,7 +39,7 @@
             <input type="file" name="image" id="scan-file" accept="image/jpeg,image/png,image/webp" required>
             <div class="icon">📷</div>
             <p><strong>ছবি আপলোড করুন</strong></p>
-            <p style="margin-top: .25rem;">JPG, PNG, WebP (সর্বোচ্চ ২MB)</p>
+            <p style="margin-top: .25rem;">JPG, PNG, WebP (সর্বোচ্চ ১০MB)</p>
         </label>
 
         <div id="scan-preview">

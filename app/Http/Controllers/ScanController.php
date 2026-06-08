@@ -24,12 +24,12 @@ class ScanController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'image' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,webp', 'max:10240'],
         ], [
             'image.required' => 'ছবি আপলোড করুন',
             'image.image' => 'শুধুমাত্র ছবি আপলোড করুন',
             'image.mimes' => 'JPG, PNG, WebP ফরম্যাট সমর্থিত',
-            'image.max' => 'ছবির আকার সর্বোচ্চ ২MB হতে হবে',
+            'image.max' => 'ছবির আকার সর্বোচ্চ ১০MB হতে হবে',
         ]);
 
         $user = Auth::user();
