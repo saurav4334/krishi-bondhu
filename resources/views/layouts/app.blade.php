@@ -8,10 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --green-50: #f0faf0; --green-100: #d4f0d4; --green-200: #a8e0a8;
-            --green-400: #4caf50; --green-500: #388e3c; --green-600: #2e7d32;
-            --green-700: #1b5e20;
-            --amber-50: #fffbf0; --amber-100: #fff3cd; --amber-400: #ffc107;
+            /* Official কৃষি-বন্ধু brand palette: Dark #0B6B2E · Light #7AC943 · Yellow #E5B93C */
+            --green-50: #eef7ea; --green-100: #d6efc9; --green-200: #b3e191;
+            --green-400: #7AC943; --green-500: #0B6B2E; --green-600: #095826;
+            --green-700: #06401b;
+            --amber-50: #fdf8ea; --amber-100: #f8ecc4; --amber-400: #E5B93C;
             --sky-50: #f0f8ff; --sky-100: #cce8ff; --sky-400: #2196f3; --sky-500: #1565c0;
             --red-50: #fff5f5; --red-100: #ffcdd2; --red-400: #ef5350; --red-500: #c62828;
             --brown-50: #fdf5f0; --brown-100: #f5ddd0;
@@ -80,10 +81,36 @@
         .alert-error { background: var(--red-50); border: 1px solid var(--red-100); color: var(--red-500); }
 
         @media (max-width: 480px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+
+        /* Splash screen — auto-dismisses via CSS even without JS */
+        #splash { position: fixed; inset: 0; z-index: 3000; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; animation: splashOut .6s ease 1.8s forwards; }
+        #splash .splash-logo { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; font-size: 4rem; animation: splashIn .8s ease both; }
+        #splash .splash-logo img { width: 100%; height: 100%; object-fit: contain; }
+        #splash h1 { color: var(--green-500); font-family: 'Noto Serif Bengali', serif; font-size: 2rem; animation: splashIn .9s ease both; }
+        #splash p { color: var(--text-secondary); font-size: 15px; animation: splashIn 1s ease both; }
+        @keyframes splashIn { from { opacity: 0; transform: translateY(14px) scale(.95); } to { opacity: 1; transform: none; } }
+        @keyframes splashOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
     </style>
     @stack('styles')
 </head>
 <body>
+    {{-- Splash screen (shown once per browser session). Drop the official logo at public/images/logo.png and swap the emoji below. --}}
+    <div id="splash">
+        <div class="splash-logo">
+            {{-- <img src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু"> --}}
+            🌾
+        </div>
+        <h1>কৃষি-বন্ধু</h1>
+        <p>কৃষকের ডিজিটাল সহায়ক</p>
+    </div>
+    <script>
+        (function () {
+            var s = document.getElementById('splash');
+            if (sessionStorage.getItem('kb_splash')) { s.style.display = 'none'; }
+            else { sessionStorage.setItem('kb_splash', '1'); }
+        })();
+    </script>
+
     @auth
     <nav id="nav">
         <div class="logo"><span>🌾</span> কৃষি-বন্ধু</div>

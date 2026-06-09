@@ -39,13 +39,29 @@
                 <input type="tel" name="mobile" value="{{ old('mobile') }}" placeholder="01XXXXXXXXX" maxlength="11" required>
             </div>
             <div class="form-group">
-                <label>জেলা</label>
-                <select name="district" required>
-                    <option value="">জেলা নির্বাচন করুন</option>
-                    @foreach(['ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা','বরিশাল','সিলেট','ময়মনসিংহ','রংপুর','বগুড়া','কুমিল্লা','নারায়ণগঞ্জ','গাজীপুর','যশোর','দিনাজপুর','ফরিদপুর'] as $d)
-                        <option value="{{ $d }}" {{ old('district') === $d ? 'selected' : '' }}>{{ $d }}</option>
+                <label>বিভাগ</label>
+                <select name="division" id="sel-division" required>
+                    <option value="">বিভাগ নির্বাচন করুন</option>
+                    @foreach($divisions as $div)
+                        <option value="{{ $div->bn_name }}" data-id="{{ $div->id }}" {{ old('division') === $div->bn_name ? 'selected' : '' }}>{{ $div->bn_name }}</option>
                     @endforeach
                 </select>
+            </div>
+            <div class="form-group">
+                <label>জেলা</label>
+                <select name="district" id="sel-district" required>
+                    <option value="">আগে বিভাগ নির্বাচন করুন</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>উপজেলা</label>
+                <select name="upazila" id="sel-upazila" required>
+                    <option value="">আগে জেলা নির্বাচন করুন</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>ইউনিয়ন <span style="color: var(--text-muted); font-weight: 400;">(ঐচ্ছিক)</span></label>
+                <input type="text" name="union_name" value="{{ old('union_name') }}" placeholder="ইউনিয়নের নাম">
             </div>
             <div class="form-group">
                 <label>পাসওয়ার্ড</label>
@@ -63,4 +79,54 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script>
+    const DISTRICTS = @json($districts);
+    const UPAZILAS  = @json($upazilas);
+    const OLD = { division: @json(old('division')), district: @json(old('district')), upazila: @json(old('upazila')) };
+
+    const selDivision = document.getElementById('sel-division');
+    const selDistrict = document.getElementById('sel-district');
+    const selUpazila  = document.getElementById('sel-upazila');
+
+    function fill(select, items, placeholder, selectedValue) {
+        select.innerHTML = '<option value="">' + placeholder + '</option>';
+        items.forEach(it => {
+            const opt = document.createElement('option');
+            opt.value = it.bn_name;
+            opt.dataset.id = it.id;
+            opt.textContent = it.bn_name;
+            if (selectedValue && selectedValue === it.bn_name) opt.selected = true;
+            select.appendChild(opt);
+        });
+    }
+
+    function divisionId() {
+        const o = selDivision.selectedOptions[0];
+        return o ? o.dataset.id : null;
+    }
+    function districtId() {
+        const o = selDistrict.selectedOptions[0];
+        return o ? o.dataset.id : null;
+    }
+
+    function loadDistricts(selectedValue) {
+        const id = divisionId();
+        const list = id ? DISTRICTS.filter(d => String(d.division_id) === String(id)) : [];
+        fill(selDistrict, list, 'জেলা নির্বাচন করুন', selectedValue);
+    }
+    function loadUpazilas(selectedValue) {
+        const id = districtId();
+        const list = id ? UPAZILAS.filter(u => String(u.district_id) === String(id)) : [];
+        fill(selUpazila, list, 'উপজেলা নির্বাচন করুন', selectedValue);
+    }
+
+    selDivision.addEventListener('change', () => { loadDistricts(); loadUpazilas(); });
+    selDistrict.addEventListener('change', () => loadUpazilas());
+
+    // Restore old() selections after a validation error
+    if (OLD.division) { loadDistricts(OLD.district); loadUpazilas(OLD.upazila); }
+</script>
+@endpush
 @endsection

@@ -18,7 +18,7 @@
     <div class="auth-hero">
         <span class="emoji">🌾</span>
         <h1>কৃষি-বন্ধু</h1>
-        <p>বাংলাদেশের কৃষকদের স্মার্ট সহায়তা প্ল্যাটফর্ম</p>
+        <p>কৃষকের ডিজিটাল সহায়ক</p>
     </div>
 
     @if(session('success'))

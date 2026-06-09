@@ -76,25 +76,117 @@
     </form>
 </div>
 
-@if($recent_users->count())
+{{-- District Management --}}
 <div class="card">
-    <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">👥 সাম্প্রতিক ব্যবহারকারী</h3>
+    <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">🗺️ জেলা ব্যবস্থাপনা</h3>
+    <form method="POST" action="{{ route('admin.districts.store') }}" style="margin-bottom: 1rem;">
+        @csrf
+        <div class="grid-2" style="gap: .5rem;">
+            <div class="form-group" style="margin-bottom: .5rem;">
+                <label>বিভাগ</label>
+                <select name="division_id" required>
+                    <option value="">নির্বাচন করুন</option>
+                    @foreach($divisions as $div)
+                        <option value="{{ $div->id }}">{{ $div->bn_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group" style="margin-bottom: .5rem;">
+                <label>জেলার নাম (বাংলা)</label>
+                <input type="text" name="bn_name" placeholder="যেমন: নড়াইল" required>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">+ জেলা যুক্ত করুন</button>
+    </form>
+
+    <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: var(--radius-sm);">
+        <table class="admin-table">
+            <thead>
+                <tr><th>জেলা</th><th>বিভাগ</th><th>স্ট্যাটাস</th><th>অ্যাকশন</th></tr>
+            </thead>
+            <tbody>
+                @foreach($districts as $d)
+                    <tr>
+                        <td>{{ $d->bn_name }}</td>
+                        <td>{{ $d->division->bn_name ?? '-' }}</td>
+                        <td>
+                            @if($d->status === 'active')
+                                <span class="badge badge-green">সক্রিয়</span>
+                            @else
+                                <span class="badge badge-red">নিষ্ক্রিয়</span>
+                            @endif
+                        </td>
+                        <td style="white-space: nowrap;">
+                            <button type="button" onclick="editDistrict({{ $d->id }}, '{{ $d->bn_name }}')" title="সম্পাদনা" style="background: none; font-size: 15px;">✏️</button>
+                            <form method="POST" action="{{ route('admin.districts.toggle', $d) }}" style="display: inline;">
+                                @csrf @method('PATCH')
+                                <button type="submit" title="সক্রিয়/নিষ্ক্রিয়" style="background: none; font-size: 15px;">{{ $d->status === 'active' ? '🚫' : '✅' }}</button>
+                            </form>
+                            <form method="POST" action="{{ route('admin.districts.delete', $d) }}" style="display: inline;" onsubmit="return confirm('এই জেলা মুছে ফেলবেন?')">
+                                @csrf @method('DELETE')
+                                <button type="submit" title="মুছুন" style="background: none; font-size: 15px;">🗑️</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+    {{-- shared hidden form for inline edit --}}
+    <form method="POST" id="edit-district-form" action="">
+        @csrf @method('PUT')
+        <input type="hidden" name="bn_name" id="edit-district-name">
+    </form>
+</div>
+
+{{-- Users (with district filter) --}}
+<div class="card">
+    <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">
+        👥 ব্যবহারকারী @if($districtFilter)<span style="font-size: 13px; color: var(--text-muted);">— {{ $districtFilter }}</span>@endif
+    </h3>
+    <form method="GET" action="{{ route('admin.index') }}" style="display: flex; gap: .5rem; margin-bottom: .75rem;">
+        <select name="district" onchange="this.form.submit()" style="flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+            <option value="">সকল জেলা অনুযায়ী ফিল্টার</option>
+            @foreach($districts as $d)
+                <option value="{{ $d->bn_name }}" {{ $districtFilter === $d->bn_name ? 'selected' : '' }}>{{ $d->bn_name }}</option>
+            @endforeach
+        </select>
+        @if($districtFilter)<a href="{{ route('admin.index') }}" class="btn btn-secondary" style="padding: 8px 12px;">✕</a>@endif
+    </form>
+    @if($recent_users->count())
     <table class="admin-table">
         <thead>
-            <tr><th>নাম</th><th>মোবাইল</th><th>ভূমিকা</th></tr>
+            <tr><th>নাম</th><th>মোবাইল</th><th>জেলা</th><th>ভূমিকা</th></tr>
         </thead>
         <tbody>
             @foreach($recent_users as $u)
                 <tr>
                     <td>{{ $u->name }}</td>
                     <td>{{ $u->mobile }}</td>
+                    <td>{{ $u->district ?? '-' }}</td>
                     <td>{{ $u->getRoleLabel() }}</td>
                 </tr>
             @endforeach
         </tbody>
     </table>
+    @else
+        <p style="text-align: center; color: var(--text-muted); font-size: 14px; padding: .5rem;">এই জেলায় কোনো ব্যবহারকারী নেই</p>
+    @endif
 </div>
-@endif
+
+@push('scripts')
+<script>
+    function editDistrict(id, current) {
+        const name = prompt('নতুন জেলার নাম:', current);
+        if (name === null || name.trim() === '') return;
+        const form = document.getElementById('edit-district-form');
+        form.action = '{{ url('admin/districts') }}/' + id;
+        document.getElementById('edit-district-name').value = name.trim();
+        form.submit();
+    }
+</script>
+@endpush
 
 @if($recent_scans->count())
 <div class="card">

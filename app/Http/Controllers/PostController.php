@@ -34,7 +34,7 @@ class PostController extends Controller
             'location' => ['required', 'string', 'max:100'],
             'mobile' => ['required', 'regex:/^01[3-9][0-9]{8}$/'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:10240'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,webp', 'max:2048'],
         ], [
             'crop_name.required' => 'ফসলের নাম দিন',
             'quantity.required' => 'পরিমাণ দিন',
@@ -44,7 +44,7 @@ class PostController extends Controller
             'mobile.required' => 'মোবাইল নম্বর দিন',
             'mobile.regex' => 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
             'image.image' => 'শুধুমাত্র ছবি আপলোড করুন',
-            'image.max' => 'ছবির আকার সর্বোচ্চ ১০MB',
+            'image.max' => 'ছবির আকার সর্বোচ্চ ২MB',
         ]);
 
         if ($request->hasFile('image')) {

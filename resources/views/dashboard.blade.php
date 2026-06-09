@@ -8,7 +8,7 @@
     .weather-card h3 { font-family: 'Hind Siliguri', sans-serif; font-weight: 600; opacity: .9; font-size: 14px; }
     .weather-card .temp { font-size: 2.5rem; font-weight: 700; }
     .weather-card .detail { opacity: .85; font-size: 13px; margin-top: .25rem; }
-    .quick-actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: .65rem; margin-bottom: 1rem; }
+    .quick-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: .65rem; margin-bottom: 1rem; }
     .quick-btn { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: .75rem .5rem; display: flex; flex-direction: column; align-items: center; gap: 5px; color: var(--text-secondary); font-size: 12px; font-weight: 500; cursor: pointer; transition: all .2s; text-align: center; text-decoration: none; }
     .quick-btn:hover { background: var(--green-50); border-color: var(--green-200); color: var(--green-600); transform: translateY(-2px); }
     .quick-btn .icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
@@ -59,14 +59,6 @@
     <a href="{{ route('experts.index') }}" class="quick-btn">
         <div class="icon" style="background: var(--sky-50);">👨‍🔬</div>
         বিশেষজ্ঞ
-    </a>
-    <a href="{{ route('labor.index') }}" class="quick-btn">
-        <div class="icon" style="background: var(--amber-50);">👷</div>
-        শ্রমিক খুঁজুন
-    </a>
-    <a href="{{ route('transport.index') }}" class="quick-btn">
-        <div class="icon" style="background: var(--sky-50);">🚜</div>
-        পরিবহন বুক করুন
     </a>
 </div>
 

@@ -14,7 +14,10 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'mobile',
+        'division',
         'district',
+        'upazila',
+        'union_name',
         'role',
         'password',
         'daily_scan_count',
@@ -63,5 +66,13 @@ class User extends Authenticatable
             'expert' => '👨‍🔬 বিশেষজ্ঞ',
             default => '🧑‍🌾 কৃষক',
         };
+    }
+
+    /**
+     * Tells Laravel to use 'mobile' as the username for login
+     */
+    public function getAuthIdentifierName()
+    {
+        return 'mobile';
     }
 }
