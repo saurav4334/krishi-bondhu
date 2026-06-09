@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpertController;
+use App\Http\Controllers\LaborController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
+use App\Http\Controllers\TransportController;
 use Illuminate\Support\Facades\Route;
 
 // Root → redirect to dashboard or login
@@ -46,6 +48,20 @@ Route::middleware('auth')->group(function () {
 
     // Experts
     Route::get('/experts', [ExpertController::class, 'index'])->name('experts.index');
+
+    // Agriculture Labor Service
+    Route::get('/labor', [LaborController::class, 'index'])->name('labor.index');
+    Route::get('/labor/register', [LaborController::class, 'register'])->name('labor.register');
+    Route::post('/labor/register', [LaborController::class, 'storeWorker'])->name('labor.worker.store');
+    Route::get('/labor/jobs/create', [LaborController::class, 'createJob'])->name('labor.jobs.create');
+    Route::post('/labor/jobs', [LaborController::class, 'storeJob'])->name('labor.jobs.store');
+
+    // Agriculture Transport Service
+    Route::get('/transport', [TransportController::class, 'index'])->name('transport.index');
+    Route::get('/transport/register', [TransportController::class, 'register'])->name('transport.register');
+    Route::post('/transport/register', [TransportController::class, 'storeProvider'])->name('transport.provider.store');
+    Route::get('/transport/book/{provider?}', [TransportController::class, 'book'])->name('transport.book');
+    Route::post('/transport/book', [TransportController::class, 'storeBooking'])->name('transport.booking.store');
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
