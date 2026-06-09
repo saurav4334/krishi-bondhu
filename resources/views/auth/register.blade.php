@@ -14,7 +14,7 @@
 
 <div class="auth-page">
     <div class="auth-hero">
-        <span class="emoji">🌾</span>
+        <img src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু" style="width: min(52%, 150px); height: auto; display: block; margin: 0 auto .25rem;">
         <h1>নতুন অ্যাকাউন্ট</h1>
         <p style="color: var(--text-secondary); margin-top: .3rem;">কৃষি-বন্ধুতে আপনাকে স্বাগতম</p>
     </div>

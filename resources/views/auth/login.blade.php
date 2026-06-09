@@ -16,9 +16,7 @@
 
 <div class="auth-page">
     <div class="auth-hero">
-        <span class="emoji">🌾</span>
-        <h1>কৃষি-বন্ধু</h1>
-        <p>কৃষকের ডিজিটাল সহায়ক</p>
+        <img src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু — কৃষকের ডিজিটাল সহায়ক" style="width: min(78%, 260px); height: auto;">
     </div>
 
     @if(session('success'))

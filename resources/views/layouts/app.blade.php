@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'কৃষি-বন্ধু') | Smart Agriculture Assistant</title>
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/logo.png') }}">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif+Bengali:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -83,25 +85,17 @@
         @media (max-width: 480px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
 
         /* Splash screen — auto-dismisses via CSS even without JS */
-        #splash { position: fixed; inset: 0; z-index: 3000; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; animation: splashOut .6s ease 1.8s forwards; }
-        #splash .splash-logo { width: 96px; height: 96px; display: flex; align-items: center; justify-content: center; font-size: 4rem; animation: splashIn .8s ease both; }
-        #splash .splash-logo img { width: 100%; height: 100%; object-fit: contain; }
-        #splash h1 { color: var(--green-500); font-family: 'Noto Serif Bengali', serif; font-size: 2rem; animation: splashIn .9s ease both; }
-        #splash p { color: var(--text-secondary); font-size: 15px; animation: splashIn 1s ease both; }
+        #splash { position: fixed; inset: 0; z-index: 3000; background: #fff; display: flex; align-items: center; justify-content: center; animation: splashOut .6s ease 1.9s forwards; }
+        #splash .splash-logo { width: min(72vw, 300px); height: auto; animation: splashIn .8s ease both; }
         @keyframes splashIn { from { opacity: 0; transform: translateY(14px) scale(.95); } to { opacity: 1; transform: none; } }
         @keyframes splashOut { to { opacity: 0; visibility: hidden; pointer-events: none; } }
     </style>
     @stack('styles')
 </head>
 <body>
-    {{-- Splash screen (shown once per browser session). Drop the official logo at public/images/logo.png and swap the emoji below. --}}
+    {{-- Splash screen (shown once per browser session) --}}
     <div id="splash">
-        <div class="splash-logo">
-            {{-- <img src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু"> --}}
-            🌾
-        </div>
-        <h1>কৃষি-বন্ধু</h1>
-        <p>কৃষকের ডিজিটাল সহায়ক</p>
+        <img class="splash-logo" src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু — কৃষকের ডিজিটাল সহায়ক">
     </div>
     <script>
         (function () {
