@@ -32,28 +32,6 @@
 </div>
 
 <div class="card">
-    <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">প্রোফাইল সম্পাদনা</h3>
-    <form method="POST" action="{{ route('profile.update') }}">
-        @csrf
-        @method('PUT')
-        <div class="form-group">
-            <label>নাম</label>
-            <input type="text" name="name" value="{{ old('name', $user->name) }}" required>
-        </div>
-        <div class="form-group">
-            <label>জেলা</label>
-            <select name="district">
-                <option value="">জেলা নির্বাচন করুন</option>
-                @foreach(['ঢাকা','চট্টগ্রাম','রাজশাহী','খুলনা','বরিশাল','সিলেট','ময়মনসিংহ','রংপুর','বগুড়া','কুমিল্লা','নারায়ণগঞ্জ','গাজীপুর','যশোর','দিনাজপুর','ফরিদপুর'] as $d)
-                    <option value="{{ $d }}" {{ old('district', $user->district) === $d ? 'selected' : '' }}>{{ $d }}</option>
-                @endforeach
-            </select>
-        </div>
-        <button type="submit" class="btn btn-primary btn-block">সংরক্ষণ করুন</button>
-    </form>
-</div>
-
-<div class="card">
     <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">🔒 পাসওয়ার্ড পরিবর্তন</h3>
     <form method="POST" action="{{ route('profile.password') }}">
         @csrf
