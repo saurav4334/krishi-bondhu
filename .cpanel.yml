@@ -1,0 +1,21 @@
+---
+# cPanel Git™ Version Control deployment.
+# Runs when you click "Deploy HEAD Commit" in cPanel (or via git push if
+# auto-deploy is on). Assumes the repository is cloned at the application
+# root and the domain's Document Root points to this repo's `public/` folder.
+#
+# Adjust the php binary if needed (cPanel often exposes versioned bins like
+# /usr/local/bin/ea-php81). Find yours with: which php  OR  ls /usr/local/bin/ea-php*
+deployment:
+  tasks:
+    - export PHP=/usr/local/bin/php
+    # Ensure the SQLite database file exists (skip if you use MySQL)
+    - /bin/sh -c 'test -f database/database.sqlite || touch database/database.sqlite'
+    # Apply DB schema (safe in production)
+    - $PHP artisan migrate --force
+    # Public storage symlink for uploaded images
+    - $PHP artisan storage:link || true
+    # Rebuild caches with the latest code/config/routes/views
+    - $PHP artisan config:cache
+    - $PHP artisan route:cache
+    - $PHP artisan view:cache

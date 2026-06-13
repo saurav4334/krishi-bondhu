@@ -21,6 +21,13 @@
     <div class="admin-stat"><div class="n">{{ $stats['directory_experts'] }}</div><div class="l">বিশেষজ্ঞ</div></div>
 </div>
 
+{{-- Module management shortcuts --}}
+<div class="grid-3" style="margin-bottom: 1rem;">
+    <a href="{{ route('admin.marketplace.index') }}" class="btn btn-secondary" style="justify-content: center;">🛒 মার্কেটপ্লেস</a>
+    <a href="{{ route('admin.news.index') }}" class="btn btn-secondary" style="justify-content: center;">📰 সংবাদ</a>
+    <a href="{{ route('admin.weather.index') }}" class="btn btn-secondary" style="justify-content: center;">🌦️ আবহাওয়া</a>
+</div>
+
 <div class="card">
     <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">📢 বিজ্ঞপ্তি পাঠান</h3>
     <form method="POST" action="{{ route('admin.notifications.store') }}">

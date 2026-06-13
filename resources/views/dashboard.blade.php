@@ -28,20 +28,28 @@
     .scan-hist-item .info p { font-size: 12px; color: var(--text-muted); }
 </style>
 
-<div class="weather-card">
+<a href="{{ route('weather.index') }}" class="weather-card" style="display: block; color: #fff;">
     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
         <div>
-            <h3>☀️ আজকের আবহাওয়া</h3>
-            <div class="temp">২৮°C</div>
-            <div class="detail">আংশিক মেঘলা · আর্দ্রতা ৭৮%</div>
-            <div class="detail">📍 {{ $user->district ?: 'বাংলাদেশ' }}</div>
+            <h3>{{ $weather['emoji'] }} আজকের আবহাওয়া</h3>
+            <div class="temp">{{ $weather['temp'] }}°C</div>
+            <div class="detail">{{ $weather['desc'] }} · আর্দ্রতা {{ $weather['humidity'] }}%</div>
+            <div class="detail">📍 {{ $weather['district'] ?: 'বাংলাদেশ' }}</div>
         </div>
         <div style="text-align: right; opacity: .85;">
-            <div style="font-size: 2rem;">🌤️</div>
-            <div style="font-size: 12px; margin-top: .3rem;">বাতাস ১২ কি.মি./ঘ.</div>
+            <div style="font-size: 2rem;">{{ $weather['emoji'] }}</div>
+            <div style="font-size: 12px; margin-top: .3rem;">বাতাস {{ $weather['wind'] }} কি.মি./ঘ.</div>
         </div>
     </div>
-</div>
+</a>
+
+@foreach($weatherAlerts as $alert)
+    <a href="{{ route('weather.index') }}" style="display: flex; gap: .6rem; align-items: center; padding: .7rem .9rem; background: var(--red-50); border: 1px solid var(--red-100); border-radius: var(--radius); margin-bottom: .6rem; color: var(--red-500);">
+        <span style="font-size: 1.4rem;">{{ $alert->icon }}</span>
+        <div><strong style="font-size: 14px; font-family: 'Hind Siliguri', sans-serif;">{{ $alert->title }}</strong>
+        <div style="font-size: 11px; opacity: .85;">{{ $alert->type_label }} · {{ $alert->alert_date->format('d/m/Y') }}</div></div>
+    </a>
+@endforeach
 
 <div class="quick-actions">
     <a href="{{ route('scan.index') }}" class="quick-btn">
@@ -68,6 +76,14 @@
         <div class="icon" style="background: var(--sky-50);">🚜</div>
         পরিবহন বুক করুন
     </a>
+    <a href="{{ route('news.index') }}" class="quick-btn">
+        <div class="icon" style="background: var(--green-50);">📰</div>
+        কৃষি সংবাদ
+    </a>
+    <a href="{{ route('weather.index') }}" class="quick-btn">
+        <div class="icon" style="background: var(--sky-50);">🌦️</div>
+        আবহাওয়া
+    </a>
 </div>
 
 <div class="stat-cards">
@@ -86,6 +102,27 @@
         </div>
     </div>
 @endforeach
+
+@if($latestNews->count())
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div class="section-title">📰 সর্বশেষ সংবাদ</div>
+        <a href="{{ route('news.index') }}" style="font-size: 12px; color: var(--green-500); font-weight: 600;">সব দেখুন →</a>
+    </div>
+    <div class="card card-sm">
+        @foreach($latestNews as $news)
+            <a href="{{ route('news.show', $news) }}" class="scan-hist-item" style="color: inherit;">
+                <div class="scan-thumb">
+                    @if($news->image)<img src="{{ asset('storage/' . $news->image) }}" alt="">@else 📰 @endif
+                </div>
+                <div class="info" style="flex: 1;">
+                    <h4>{{ $news->title }}</h4>
+                    <p>{{ $news->category->name ?? '' }} · {{ optional($news->published_at)->diffForHumans() ?? $news->created_at->diffForHumans() }}</p>
+                </div>
+                @if($news->is_important)<span class="badge badge-red">★</span>@endif
+            </a>
+        @endforeach
+    </div>
+@endif
 
 @if($recent_scans->count())
     <div class="section-title">📊 সাম্প্রতিক স্ক্যান</div>

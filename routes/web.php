@@ -1,16 +1,21 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
+use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\WeatherAlertController as AdminWeatherAlertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\LaborController;
+use App\Http\Controllers\NewsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TransportController;
+use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
 // Root → redirect to dashboard or login
@@ -49,6 +54,13 @@ Route::middleware('auth')->group(function () {
     // Experts
     Route::get('/experts', [ExpertController::class, 'index'])->name('experts.index');
 
+    // Agriculture News
+    Route::get('/news', [NewsController::class, 'index'])->name('news.index');
+    Route::get('/news/{post:slug}', [NewsController::class, 'show'])->name('news.show');
+
+    // Smart Weather
+    Route::get('/weather', [WeatherController::class, 'index'])->name('weather.index');
+
     // Agriculture Labor Service
     Route::get('/labor', [LaborController::class, 'index'])->name('labor.index');
     Route::get('/labor/register', [LaborController::class, 'register'])->name('labor.register');
@@ -83,5 +95,29 @@ Route::middleware('auth')->group(function () {
         Route::put('/districts/{district}', [AdminController::class, 'updateDistrict'])->name('districts.update');
         Route::patch('/districts/{district}/toggle', [AdminController::class, 'toggleDistrict'])->name('districts.toggle');
         Route::delete('/districts/{district}', [AdminController::class, 'deleteDistrict'])->name('districts.delete');
+
+        // Marketplace moderation + categories
+        Route::get('/marketplace', [AdminMarketplaceController::class, 'index'])->name('marketplace.index');
+        Route::patch('/marketplace/{post}/approve', [AdminMarketplaceController::class, 'approve'])->name('marketplace.approve');
+        Route::delete('/marketplace/{post}/reject', [AdminMarketplaceController::class, 'reject'])->name('marketplace.reject');
+        Route::patch('/marketplace/{post}/feature', [AdminMarketplaceController::class, 'feature'])->name('marketplace.feature');
+        Route::post('/marketplace/categories', [AdminMarketplaceController::class, 'storeCategory'])->name('marketplace.categories.store');
+        Route::patch('/marketplace/categories/{category}/toggle', [AdminMarketplaceController::class, 'toggleCategory'])->name('marketplace.categories.toggle');
+        Route::delete('/marketplace/categories/{category}', [AdminMarketplaceController::class, 'deleteCategory'])->name('marketplace.categories.delete');
+
+        // News management
+        Route::get('/news', [AdminNewsController::class, 'index'])->name('news.index');
+        Route::get('/news/create', [AdminNewsController::class, 'create'])->name('news.create');
+        Route::post('/news', [AdminNewsController::class, 'store'])->name('news.store');
+        Route::get('/news/{news}/edit', [AdminNewsController::class, 'edit'])->name('news.edit');
+        Route::put('/news/{news}', [AdminNewsController::class, 'update'])->name('news.update');
+        Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.destroy');
+        Route::post('/news/categories', [AdminNewsController::class, 'storeCategory'])->name('news.categories.store');
+        Route::delete('/news/categories/{category}', [AdminNewsController::class, 'deleteCategory'])->name('news.categories.delete');
+
+        // Weather alerts
+        Route::get('/weather', [AdminWeatherAlertController::class, 'index'])->name('weather.index');
+        Route::post('/weather', [AdminWeatherAlertController::class, 'store'])->name('weather.store');
+        Route::delete('/weather/{alert}', [AdminWeatherAlertController::class, 'destroy'])->name('weather.destroy');
     });
 });

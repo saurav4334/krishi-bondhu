@@ -177,6 +177,13 @@ class DatabaseSeeder extends Seeder
             TransportProvider::create(array_merge($p, ['user_id' => $farmer->id]));
         }
 
+        // --- Expansion modules: Marketplace categories, News, Weather alerts ---
+        $this->call([
+            MarketplaceCategorySeeder::class,
+            NewsSeeder::class,
+            WeatherAlertSeeder::class,
+        ]);
+
         $this->command->info('');
         $this->command->info('✅ Demo data seeded successfully!');
         $this->command->info('');

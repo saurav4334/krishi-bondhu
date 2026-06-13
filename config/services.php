@@ -39,4 +39,9 @@ return [
         'api_key' => env('NOTIFY_BD_API_KEY'),
         'sender_id' => env('NOTIFY_BD_SENDER_ID'),
     ],
+
+    // OpenWeather (Smart Weather module) — blank key falls back to mock data
+    'openweather' => [
+        'key' => env('OPENWEATHER_API_KEY'),
+    ],
 ];
