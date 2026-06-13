@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\NewsCategory;
 use App\Models\NewsPost;
+use App\Models\User;
+use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,6 +15,10 @@ use Illuminate\View\View;
 
 class NewsController extends Controller
 {
+    public function __construct(protected SmsService $sms)
+    {
+    }
+
     public function index(): View
     {
         return view('admin.news.index', [
@@ -76,6 +82,23 @@ class NewsController extends Controller
         $news->delete();
 
         return back()->with('success', 'সংবাদ মুছে ফেলা হয়েছে।');
+    }
+
+    /** Manually SMS a news item to farmers (district-targeted, else all). */
+    public function sendSms(NewsPost $news): RedirectResponse
+    {
+        $message = 'কৃষি সংবাদ: ' . Str::limit($news->title, 140);
+        $sent = 0;
+
+        User::where('role', 'farmer')
+            ->when($news->district, fn ($q) => $q->where('district', $news->district))
+            ->select('mobile')->chunk(100, function ($chunk) use ($message, &$sent) {
+                $mobiles = $chunk->pluck('mobile')->all();
+                $this->sms->send($mobiles, $message, 'news');
+                $sent += count($mobiles);
+            });
+
+        return back()->with('success', $sent ? "{$sent} জন কৃষককে SMS পাঠানো হয়েছে।" : 'কোনো প্রাপক পাওয়া যায়নি।');
     }
 
     public function storeCategory(Request $request): RedirectResponse

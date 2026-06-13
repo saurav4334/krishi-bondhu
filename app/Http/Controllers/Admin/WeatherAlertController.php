@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\District;
+use App\Models\User;
 use App\Models\WeatherAlert;
+use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -12,6 +14,10 @@ use Illuminate\View\View;
 
 class WeatherAlertController extends Controller
 {
+    public function __construct(protected SmsService $sms)
+    {
+    }
+
     public function index(): View
     {
         return view('admin.weather.index', [
@@ -32,6 +38,24 @@ class WeatherAlertController extends Controller
         $alert->delete();
 
         return back()->with('success', 'সতর্কতা মুছে ফেলা হয়েছে।');
+    }
+
+    /** Manually SMS this alert to farmers in its district. */
+    public function sendSms(WeatherAlert $alert): RedirectResponse
+    {
+        $message = "আবহাওয়া সতর্কতা ({$alert->district}): {$alert->title}। {$alert->description}";
+        $sent = 0;
+
+        User::where('role', 'farmer')->where('district', $alert->district)
+            ->select('mobile')->chunk(100, function ($chunk) use ($message, &$sent) {
+                $mobiles = $chunk->pluck('mobile')->all();
+                $this->sms->send($mobiles, $message, 'weather');
+                $sent += count($mobiles);
+            });
+
+        return back()->with('success', $sent
+            ? "{$alert->district} জেলার {$sent} জন কৃষককে SMS পাঠানো হয়েছে।"
+            : "{$alert->district} জেলায় কোনো কৃষক পাওয়া যায়নি।");
     }
 
     protected function validateData(Request $request): array

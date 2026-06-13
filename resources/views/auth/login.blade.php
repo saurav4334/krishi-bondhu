@@ -50,6 +50,11 @@
             <button type="submit" class="btn btn-primary btn-block">লগইন করুন</button>
         </form>
 
+        <div class="auth-link" style="display: flex; justify-content: space-between; gap: .5rem;">
+            <a href="{{ route('login.otp') }}">📱 OTP দিয়ে লগইন</a>
+            <a href="{{ route('password.request') }}">পাসওয়ার্ড ভুলে গেছেন?</a>
+        </div>
+
         <div class="auth-link">
             অ্যাকাউন্ট নেই? <a href="{{ route('register') }}">নিবন্ধন করুন</a>
         </div>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
+use App\Http\Controllers\Admin\SmsController as AdminSmsController;
 use App\Http\Controllers\Admin\WeatherAlertController as AdminWeatherAlertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
@@ -29,6 +30,24 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    // Registration mobile verification (when SMS module is enabled)
+    Route::get('/register/verify', [AuthController::class, 'showRegisterVerify'])->name('register.verify');
+    Route::post('/register/verify', [AuthController::class, 'registerVerify'])->name('register.verify.submit');
+    Route::post('/register/verify/resend', [AuthController::class, 'registerResend'])->name('register.verify.resend');
+
+    // Login with OTP (alternative to password)
+    Route::get('/login/otp', [AuthController::class, 'showOtpLogin'])->name('login.otp');
+    Route::post('/login/otp', [AuthController::class, 'sendLoginOtp'])->name('login.otp.send');
+    Route::get('/login/otp/verify', [AuthController::class, 'showOtpLoginVerify'])->name('login.otp.verify');
+    Route::post('/login/otp/verify', [AuthController::class, 'verifyLoginOtp'])->name('login.otp.verify.submit');
+    Route::post('/login/otp/resend', [AuthController::class, 'loginOtpResend'])->name('login.otp.resend');
+
+    // Forgot / reset password via OTP
+    Route::get('/forgot-password', [AuthController::class, 'showForgotPassword'])->name('password.request');
+    Route::post('/forgot-password', [AuthController::class, 'sendResetOtp'])->name('password.otp');
+    Route::get('/reset-password', [AuthController::class, 'showResetPassword'])->name('password.reset.form');
+    Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 });
 
 // Authenticated routes
@@ -114,10 +133,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/news/{news}', [AdminNewsController::class, 'destroy'])->name('news.destroy');
         Route::post('/news/categories', [AdminNewsController::class, 'storeCategory'])->name('news.categories.store');
         Route::delete('/news/categories/{category}', [AdminNewsController::class, 'deleteCategory'])->name('news.categories.delete');
+        Route::post('/news/{news}/sms', [AdminNewsController::class, 'sendSms'])->name('news.sms');
 
         // Weather alerts
         Route::get('/weather', [AdminWeatherAlertController::class, 'index'])->name('weather.index');
         Route::post('/weather', [AdminWeatherAlertController::class, 'store'])->name('weather.store');
         Route::delete('/weather/{alert}', [AdminWeatherAlertController::class, 'destroy'])->name('weather.destroy');
+        Route::post('/weather/{alert}/sms', [AdminWeatherAlertController::class, 'sendSms'])->name('weather.sms');
+
+        // SMS module (NotifyBD): settings, balance, test, broadcast, logs
+        Route::get('/sms', [AdminSmsController::class, 'index'])->name('sms.index');
+        Route::post('/sms/settings', [AdminSmsController::class, 'updateSettings'])->name('sms.settings');
+        Route::post('/sms/test', [AdminSmsController::class, 'sendTest'])->name('sms.test');
+        Route::post('/sms/broadcast', [AdminSmsController::class, 'broadcast'])->name('sms.broadcast');
     });
 });

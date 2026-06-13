@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CropPost;
 use App\Models\MarketplaceCategory;
+use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -12,6 +13,10 @@ use Illuminate\View\View;
 
 class MarketplaceController extends Controller
 {
+    public function __construct(protected SmsService $sms)
+    {
+    }
+
     public function index(Request $request): View
     {
         $filter = $request->input('filter', 'pending'); // pending | approved | all
@@ -35,7 +40,10 @@ class MarketplaceController extends Controller
     {
         $post->update(['approved' => true]);
 
-        return back()->with('success', 'পোস্ট অনুমোদিত হয়েছে।');
+        // Notify the seller (single transactional SMS; simulated if module is off).
+        $this->sms->send($post->mobile, "আপনার বিজ্ঞাপন '" . Str::limit($post->crop_name, 60) . "' অনুমোদিত হয়েছে। — কৃষি-বন্ধু", 'marketplace', $post->user_id);
+
+        return back()->with('success', 'পোস্ট অনুমোদিত হয়েছে। বিক্রেতাকে SMS পাঠানো হয়েছে।');
     }
 
     public function reject(CropPost $post): RedirectResponse

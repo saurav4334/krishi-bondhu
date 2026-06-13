@@ -70,8 +70,9 @@
                     <td>{{ $alert->icon }} {{ $alert->title }} <span class="badge badge-amber">{{ $alert->severity_label }}</span></td>
                     <td>{{ $alert->district }}</td>
                     <td>{{ $alert->alert_date->format('d/m/Y') }}</td>
-                    <td style="text-align: right;">
-                        <form method="POST" action="{{ route('admin.weather.destroy', $alert) }}" onsubmit="return confirm('মুছবেন?')">@csrf @method('DELETE')<button style="background: none; font-size: 16px;">🗑️</button></form>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <form method="POST" action="{{ route('admin.weather.sms', $alert) }}" style="display: inline;" onsubmit="return confirm('{{ $alert->district }} জেলার কৃষকদের SMS পাঠাবেন?')">@csrf<button title="SMS পাঠান" style="background: none; font-size: 16px;">📲</button></form>
+                        <form method="POST" action="{{ route('admin.weather.destroy', $alert) }}" style="display: inline;" onsubmit="return confirm('মুছবেন?')">@csrf @method('DELETE')<button style="background: none; font-size: 16px;">🗑️</button></form>
                     </td>
                 </tr>
             @empty
