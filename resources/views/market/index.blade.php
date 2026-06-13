@@ -77,7 +77,8 @@
             <div class="post-meta">
                 <span class="badge badge-green">৳{{ number_format($post->price, 0) }}</span>
                 <span class="badge badge-amber">📦 {{ $post->quantity }}</span>
-                <span class="badge badge-sky">📍 {{ $post->location }}</span>
+                <span class="badge badge-sky">📍 {{ $post->location }}{{ $post->upazila ? ', ' . $post->upazila : '' }}</span>
+                @if($post->condition_label)<span class="badge" style="background: var(--brown-50); color: #8a5a2b;">🏷️ {{ $post->condition_label }}</span>@endif
                 @if($post->category)<span class="badge" style="background: var(--green-50); color: var(--green-600);">{{ $post->category->name }}</span>@endif
             </div>
             @if($post->description)

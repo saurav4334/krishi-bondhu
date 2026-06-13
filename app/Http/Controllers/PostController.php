@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CropPost;
 use App\Models\District;
 use App\Models\MarketplaceCategory;
+use App\Models\Upazila;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -38,7 +39,8 @@ class PostController extends Controller
     {
         return view('market.create', [
             'categories' => MarketplaceCategory::active()->orderBy('name')->get(),
-            'districts' => District::active()->orderBy('bn_name')->get(),
+            'districts' => District::active()->orderBy('bn_name')->get(['id', 'bn_name']),
+            'upazilas' => Upazila::orderBy('bn_name')->get(['id', 'district_id', 'bn_name']),
         ]);
     }
 
@@ -49,7 +51,9 @@ class PostController extends Controller
             'crop_name' => ['required', 'string', 'max:100'],
             'quantity' => ['required', 'string', 'max:50'],
             'price' => ['required', 'numeric', 'min:1'],
+            'condition' => ['nullable', 'in:new,used'],
             'location' => ['required', 'string', 'max:100'],
+            'upazila' => ['nullable', 'string', 'max:60'],
             'mobile' => ['required', 'regex:/^01[3-9][0-9]{8}$/'],
             'description' => ['nullable', 'string', 'max:1000'],
             'images' => ['required', 'array', 'max:5'],
@@ -60,7 +64,7 @@ class PostController extends Controller
             'quantity.required' => 'পরিমাণ দিন',
             'price.required' => 'দাম দিন',
             'price.numeric' => 'সঠিক দাম দিন',
-            'location.required' => 'অবস্থান দিন',
+            'location.required' => 'জেলা নির্বাচন করুন',
             'mobile.required' => 'মোবাইল নম্বর দিন',
             'mobile.regex' => 'সঠিক বাংলাদেশী মোবাইল নম্বর দিন',
             'images.required' => 'অন্তত একটি ছবি দিন',
@@ -74,7 +78,9 @@ class PostController extends Controller
             'crop_name' => $validated['crop_name'],
             'quantity' => $validated['quantity'],
             'price' => $validated['price'],
+            'condition' => $validated['condition'] ?? null,
             'location' => $validated['location'],
+            'upazila' => $validated['upazila'] ?? null,
             'mobile' => $validated['mobile'],
             'description' => $validated['description'] ?? null,
             'status' => 'active',

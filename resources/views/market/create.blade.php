@@ -21,13 +21,13 @@
 
         <div class="form-group">
             <label>পণ্যের নাম *</label>
-            <input type="text" name="crop_name" value="{{ old('crop_name') }}" placeholder="যেমন: ব্রি ধান২৮ বীজ" required>
+            <input type="text" name="crop_name" value="{{ old('crop_name') }}" placeholder="যেমন: পাওয়ার টিলার / ব্রি ধান২৮ বীজ" required>
         </div>
 
         <div class="grid-2" style="gap: .5rem;">
             <div class="form-group">
                 <label>পরিমাণ *</label>
-                <input type="text" name="quantity" value="{{ old('quantity') }}" placeholder="৫০ কেজি" required>
+                <input type="text" name="quantity" value="{{ old('quantity') }}" placeholder="১ টি / ৫০ কেজি" required>
             </div>
             <div class="form-group">
                 <label>দাম (টাকা) *</label>
@@ -36,13 +36,31 @@
         </div>
 
         <div class="form-group">
-            <label>জেলা *</label>
-            <select name="location" required>
-                <option value="">নির্বাচন করুন</option>
-                @foreach($districts as $d)
-                    <option value="{{ $d->bn_name }}" {{ old('location', auth()->user()->district) === $d->bn_name ? 'selected' : '' }}>{{ $d->bn_name }}</option>
+            <label>অবস্থা <span style="color: var(--text-muted); font-weight: 400;">(যন্ত্রপাতির জন্য)</span></label>
+            <select name="condition">
+                <option value="">প্রযোজ্য নয়</option>
+                @foreach(\App\Models\CropPost::CONDITIONS as $val => $lbl)
+                    <option value="{{ $val }}" {{ old('condition') === $val ? 'selected' : '' }}>{{ $lbl }}</option>
                 @endforeach
             </select>
+        </div>
+
+        <div class="grid-2" style="gap: .5rem;">
+            <div class="form-group">
+                <label>জেলা *</label>
+                <select name="location" id="mk-district" required>
+                    <option value="">নির্বাচন করুন</option>
+                    @foreach($districts as $d)
+                        <option value="{{ $d->bn_name }}" data-id="{{ $d->id }}" {{ old('location', auth()->user()->district) === $d->bn_name ? 'selected' : '' }}>{{ $d->bn_name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label>উপজেলা</label>
+                <select name="upazila" id="mk-upazila">
+                    <option value="">আগে জেলা নির্বাচন করুন</option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">
@@ -67,4 +85,31 @@
         <p style="font-size: 12px; color: var(--text-muted); margin-top: .6rem; text-align: center;">অ্যাডমিন অনুমোদনের পর বিজ্ঞাপন প্রকাশিত হবে।</p>
     </form>
 </div>
+
+@push('scripts')
+<script>
+    const MK_UPAZILAS = @json($upazilas);
+    const MK_OLD_UPAZILA = @json(old('upazila'));
+    const mkDistrict = document.getElementById('mk-district');
+    const mkUpazila = document.getElementById('mk-upazila');
+
+    function mkLoadUpazilas(selected) {
+        const opt = mkDistrict.selectedOptions[0];
+        const id = opt ? opt.dataset.id : null;
+        const list = id ? MK_UPAZILAS.filter(u => String(u.district_id) === String(id)) : [];
+        mkUpazila.innerHTML = '<option value="">' + (id ? 'উপজেলা নির্বাচন করুন' : 'আগে জেলা নির্বাচন করুন') + '</option>';
+        list.forEach(u => {
+            const o = document.createElement('option');
+            o.value = u.bn_name;
+            o.textContent = u.bn_name;
+            if (selected && selected === u.bn_name) o.selected = true;
+            mkUpazila.appendChild(o);
+        });
+    }
+
+    mkDistrict.addEventListener('change', () => mkLoadUpazilas());
+    // Populate on load if a district is already selected (default user district / old input)
+    if (mkDistrict.value) mkLoadUpazilas(MK_OLD_UPAZILA);
+</script>
+@endpush
 @endsection

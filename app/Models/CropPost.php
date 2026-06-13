@@ -17,7 +17,9 @@ class CropPost extends Model
         'crop_name',
         'quantity',
         'price',
+        'condition',
         'location',
+        'upazila',
         'mobile',
         'description',
         'image',
@@ -31,6 +33,16 @@ class CropPost extends Model
         'featured' => 'boolean',
         'approved' => 'boolean',
     ];
+
+    public const CONDITIONS = [
+        'new' => 'নতুন',
+        'used' => 'ব্যবহৃত',
+    ];
+
+    public function getConditionLabelAttribute(): ?string
+    {
+        return $this->condition ? (self::CONDITIONS[$this->condition] ?? $this->condition) : null;
+    }
 
     public function user(): BelongsTo
     {
