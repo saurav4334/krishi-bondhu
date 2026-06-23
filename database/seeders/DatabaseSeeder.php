@@ -180,8 +180,10 @@ class DatabaseSeeder extends Seeder
         // --- Expansion modules: Marketplace categories, News, Weather alerts ---
         $this->call([
             MarketplaceCategorySeeder::class,
+            EquipmentCategorySeeder::class,
             NewsSeeder::class,
             WeatherAlertSeeder::class,
+            VoiceTemplateSeeder::class,
         ]);
 
         $this->command->info('');

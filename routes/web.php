@@ -1,12 +1,15 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\EquipmentController as AdminEquipmentController;
 use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\SmsController as AdminSmsController;
+use App\Http\Controllers\Admin\VoiceController as AdminVoiceController;
 use App\Http\Controllers\Admin\WeatherAlertController as AdminWeatherAlertController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\LaborController;
 use App\Http\Controllers\NewsController;
@@ -16,6 +19,7 @@ use App\Http\Controllers\PriceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ScanController;
 use App\Http\Controllers\TransportController;
+use App\Http\Controllers\VoiceCallbackController;
 use App\Http\Controllers\WeatherController;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +27,9 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
 });
+
+// Public Protiddhoni IVR DTMF webhook (machine-to-machine, CSRF-exempt). No auth.
+Route::post('/voice/callback', [VoiceCallbackController::class, 'handle'])->name('voice.callback');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -64,11 +71,18 @@ Route::middleware('auth')->group(function () {
     // Market Prices
     Route::get('/prices', [PriceController::class, 'index'])->name('prices.index');
 
-    // Crop Marketplace
+    // Crop Marketplace (ফসল বিক্রয় — crops only)
     Route::get('/market', [PostController::class, 'index'])->name('market.index');
     Route::get('/market/create', [PostController::class, 'create'])->name('market.create');
     Route::post('/market', [PostController::class, 'store'])->name('market.store');
     Route::delete('/market/{post}', [PostController::class, 'destroy'])->name('market.destroy');
+
+    // কৃষি সরঞ্জাম — Equipment & Agri-input Marketplace (independent module)
+    Route::get('/equipment', [EquipmentController::class, 'index'])->name('equipment.index');
+    Route::get('/equipment/create', [EquipmentController::class, 'create'])->name('equipment.create');
+    Route::post('/equipment', [EquipmentController::class, 'store'])->name('equipment.store');
+    Route::get('/equipment/{product}', [EquipmentController::class, 'show'])->name('equipment.show');
+    Route::delete('/equipment/{product}', [EquipmentController::class, 'destroy'])->name('equipment.destroy');
 
     // Experts
     Route::get('/experts', [ExpertController::class, 'index'])->name('experts.index');
@@ -124,6 +138,15 @@ Route::middleware('auth')->group(function () {
         Route::patch('/marketplace/categories/{category}/toggle', [AdminMarketplaceController::class, 'toggleCategory'])->name('marketplace.categories.toggle');
         Route::delete('/marketplace/categories/{category}', [AdminMarketplaceController::class, 'deleteCategory'])->name('marketplace.categories.delete');
 
+        // কৃষি সরঞ্জাম (equipment) moderation + categories
+        Route::get('/equipment', [AdminEquipmentController::class, 'index'])->name('equipment.index');
+        Route::patch('/equipment/{product}/approve', [AdminEquipmentController::class, 'approve'])->name('equipment.approve');
+        Route::delete('/equipment/{product}/reject', [AdminEquipmentController::class, 'reject'])->name('equipment.reject');
+        Route::patch('/equipment/{product}/feature', [AdminEquipmentController::class, 'feature'])->name('equipment.feature');
+        Route::post('/equipment/categories', [AdminEquipmentController::class, 'storeCategory'])->name('equipment.categories.store');
+        Route::patch('/equipment/categories/{category}/toggle', [AdminEquipmentController::class, 'toggleCategory'])->name('equipment.categories.toggle');
+        Route::delete('/equipment/categories/{category}', [AdminEquipmentController::class, 'deleteCategory'])->name('equipment.categories.delete');
+
         // News management
         Route::get('/news', [AdminNewsController::class, 'index'])->name('news.index');
         Route::get('/news/create', [AdminNewsController::class, 'create'])->name('news.create');
@@ -134,17 +157,28 @@ Route::middleware('auth')->group(function () {
         Route::post('/news/categories', [AdminNewsController::class, 'storeCategory'])->name('news.categories.store');
         Route::delete('/news/categories/{category}', [AdminNewsController::class, 'deleteCategory'])->name('news.categories.delete');
         Route::post('/news/{news}/sms', [AdminNewsController::class, 'sendSms'])->name('news.sms');
+        Route::post('/news/{news}/voice', [AdminNewsController::class, 'sendVoice'])->name('news.voice');
 
         // Weather alerts
         Route::get('/weather', [AdminWeatherAlertController::class, 'index'])->name('weather.index');
         Route::post('/weather', [AdminWeatherAlertController::class, 'store'])->name('weather.store');
         Route::delete('/weather/{alert}', [AdminWeatherAlertController::class, 'destroy'])->name('weather.destroy');
         Route::post('/weather/{alert}/sms', [AdminWeatherAlertController::class, 'sendSms'])->name('weather.sms');
+        Route::post('/weather/{alert}/voice', [AdminWeatherAlertController::class, 'sendVoice'])->name('weather.voice');
 
         // SMS module (NotifyBD): settings, balance, test, broadcast, logs
         Route::get('/sms', [AdminSmsController::class, 'index'])->name('sms.index');
         Route::post('/sms/settings', [AdminSmsController::class, 'updateSettings'])->name('sms.settings');
         Route::post('/sms/test', [AdminSmsController::class, 'sendTest'])->name('sms.test');
         Route::post('/sms/broadcast', [AdminSmsController::class, 'broadcast'])->name('sms.broadcast');
+
+        // Protiddhoni Voice module: settings, templates, test call, campaign, logs, retry
+        Route::get('/voice', [AdminVoiceController::class, 'index'])->name('voice.index');
+        Route::post('/voice/settings', [AdminVoiceController::class, 'updateSettings'])->name('voice.settings');
+        Route::post('/voice/templates/{template}', [AdminVoiceController::class, 'updateTemplate'])->name('voice.templates.update');
+        Route::post('/voice/test', [AdminVoiceController::class, 'sendTest'])->name('voice.test');
+        Route::post('/voice/campaign', [AdminVoiceController::class, 'campaign'])->name('voice.campaign');
+        Route::post('/voice/retry', [AdminVoiceController::class, 'retry'])->name('voice.retry');
+        Route::patch('/voice/callbacks/{callback}/done', [AdminVoiceController::class, 'markCallbackDone'])->name('voice.callbacks.done');
     });
 });

@@ -44,4 +44,13 @@ return [
     'openweather' => [
         'key' => env('OPENWEATHER_API_KEY'),
     ],
+
+    // Protiddhoni voice (Direct TTS + IVR) — token managed via admin panel (encrypted in DB)
+    'protiddhoni' => [
+        'url' => env('PROTIDDHONI_API_URL', 'https://dashboard.protiddhoni-bd.com/api/surveys/direct-tts'),
+        'token' => env('PROTIDDHONI_API_TOKEN'),
+        'sender' => env('PROTIDDHONI_SENDER', '09612254680'),
+        'voice' => env('PROTIDDHONI_VOICE', 'female'),
+        'language' => env('PROTIDDHONI_LANGUAGE', 'bn'),
+    ],
 ];

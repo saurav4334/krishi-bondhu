@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\NewsCategory;
 use App\Models\NewsPost;
 use App\Models\User;
+use App\Services\ProtiddhoniVoiceService;
 use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ use Illuminate\View\View;
 
 class NewsController extends Controller
 {
-    public function __construct(protected SmsService $sms)
+    public function __construct(protected SmsService $sms, protected ProtiddhoniVoiceService $voice)
     {
     }
 
@@ -99,6 +100,29 @@ class NewsController extends Controller
             });
 
         return back()->with('success', $sent ? "{$sent} জন কৃষককে SMS পাঠানো হয়েছে।" : 'কোনো প্রাপক পাওয়া যায়নি।');
+    }
+
+    /** Queue a government-circular voice alert to farmers (district-filtered if set). */
+    public function sendVoice(NewsPost $news): RedirectResponse
+    {
+        $queued = 0;
+        User::where('role', 'farmer')
+            ->when($news->district, fn ($q) => $q->where('district', $news->district))
+            ->whereNotNull('mobile')
+            ->select('id', 'name', 'mobile', 'district')
+            ->chunk(200, function ($chunk) use ($news, &$queued) {
+                foreach ($chunk as $u) {
+                    $this->voice->sendGovernmentCircularAlert(
+                        $u->mobile,
+                        ['name' => $u->name, 'district' => $u->district, 'date' => now()->format('d/m/Y')],
+                        $u->id,
+                        $news->id
+                    );
+                    $queued++;
+                }
+            });
+
+        return back()->with('success', $queued ? "{$queued} জন কৃষকের জন্য ভয়েস কল সারিবদ্ধ হয়েছে।" : 'কোনো প্রাপক পাওয়া যায়নি।');
     }
 
     public function storeCategory(Request $request): RedirectResponse

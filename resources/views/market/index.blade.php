@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'কৃষি মার্কেটপ্লেস')
+@section('title', 'ফসল বিক্রয়')
 
 @section('content')
 <style>
@@ -26,7 +26,7 @@
 </style>
 
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-    <h2 class="page-title" style="margin: 0; border: none; padding: 0;">🛒 কৃষি মার্কেটপ্লেস</h2>
+    <h2 class="page-title" style="margin: 0; border: none; padding: 0;">🌾 ফসল বিক্রয়</h2>
     <a href="{{ route('market.create') }}" class="btn btn-primary">+ পোস্ট</a>
 </div>
 

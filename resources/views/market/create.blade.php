@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
-@section('title', 'পোস্ট তৈরি')
+@section('title', 'ফসল বিক্রয়')
 
 @section('content')
-<h2 class="page-title">🌾 নতুন বিজ্ঞাপন</h2>
+<h2 class="page-title">🌾 নতুন ফসল বিজ্ঞাপন</h2>
 
 <div class="card">
     <form method="POST" action="{{ route('market.store') }}" enctype="multipart/form-data">
@@ -20,8 +20,8 @@
         </div>
 
         <div class="form-group">
-            <label>পণ্যের নাম *</label>
-            <input type="text" name="crop_name" value="{{ old('crop_name') }}" placeholder="যেমন: পাওয়ার টিলার / ব্রি ধান২৮ বীজ" required>
+            <label>ফসলের নাম *</label>
+            <input type="text" name="crop_name" value="{{ old('crop_name') }}" placeholder="যেমন: আমন ধান / মিনিকেট চাল / লাল আলু" required>
         </div>
 
         <div class="grid-2" style="gap: .5rem;">
@@ -33,16 +33,6 @@
                 <label>দাম (টাকা) *</label>
                 <input type="number" name="price" value="{{ old('price') }}" placeholder="১০০০" step="0.01" required>
             </div>
-        </div>
-
-        <div class="form-group">
-            <label>অবস্থা <span style="color: var(--text-muted); font-weight: 400;">(যন্ত্রপাতির জন্য)</span></label>
-            <select name="condition">
-                <option value="">প্রযোজ্য নয়</option>
-                @foreach(\App\Models\CropPost::CONDITIONS as $val => $lbl)
-                    <option value="{{ $val }}" {{ old('condition') === $val ? 'selected' : '' }}>{{ $lbl }}</option>
-                @endforeach
-            </select>
         </div>
 
         <div class="grid-2" style="gap: .5rem;">

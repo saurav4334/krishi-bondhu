@@ -62,7 +62,11 @@
     </a>
     <a href="{{ route('market.index') }}" class="quick-btn">
         <div class="icon" style="background: var(--brown-50);">🛒</div>
-        ফসল বিক্রি
+        ফসল বিক্রয়
+    </a>
+    <a href="{{ route('equipment.index') }}" class="quick-btn">
+        <div class="icon" style="background: var(--amber-50);">🚜</div>
+        কৃষি সরঞ্জাম
     </a>
     <a href="{{ route('experts.index') }}" class="quick-btn">
         <div class="icon" style="background: var(--sky-50);">👨‍🔬</div>

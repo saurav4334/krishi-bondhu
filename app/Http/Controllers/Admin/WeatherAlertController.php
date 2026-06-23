@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\District;
 use App\Models\User;
 use App\Models\WeatherAlert;
+use App\Services\ProtiddhoniVoiceService;
 use App\Services\SmsService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ use Illuminate\View\View;
 
 class WeatherAlertController extends Controller
 {
-    public function __construct(protected SmsService $sms)
+    public function __construct(protected SmsService $sms, protected ProtiddhoniVoiceService $voice)
     {
     }
 
@@ -55,6 +56,21 @@ class WeatherAlertController extends Controller
 
         return back()->with('success', $sent
             ? "{$alert->district} জেলার {$sent} জন কৃষককে SMS পাঠানো হয়েছে।"
+            : "{$alert->district} জেলায় কোনো কৃষক পাওয়া যায়নি।");
+    }
+
+    /** Queue an automated Bengali voice alert to farmers in this alert's district. */
+    public function sendVoice(WeatherAlert $alert): RedirectResponse
+    {
+        $queued = $this->voice->dispatchToFarmersInDistrict(
+            'weather_alert',
+            $alert->district,
+            ['date' => $alert->alert_date->format('d/m/Y')],
+            $alert->id
+        );
+
+        return back()->with('success', $queued
+            ? "{$alert->district} জেলার {$queued} জন কৃষকের জন্য ভয়েস কল সারিবদ্ধ হয়েছে।"
             : "{$alert->district} জেলায় কোনো কৃষক পাওয়া যায়নি।");
     }
 

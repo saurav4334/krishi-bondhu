@@ -72,6 +72,7 @@
                     <td>{{ $alert->alert_date->format('d/m/Y') }}</td>
                     <td style="text-align: right; white-space: nowrap;">
                         <form method="POST" action="{{ route('admin.weather.sms', $alert) }}" style="display: inline;" onsubmit="return confirm('{{ $alert->district }} জেলার কৃষকদের SMS পাঠাবেন?')">@csrf<button title="SMS পাঠান" style="background: none; font-size: 16px;">📲</button></form>
+                        <form method="POST" action="{{ route('admin.weather.voice', $alert) }}" style="display: inline;" onsubmit="return confirm('{{ $alert->district }} জেলার কৃষকদের ভয়েস কল পাঠাবেন?')">@csrf<button title="ভয়েস কল পাঠান" style="background: none; font-size: 16px;">📞</button></form>
                         <form method="POST" action="{{ route('admin.weather.destroy', $alert) }}" style="display: inline;" onsubmit="return confirm('মুছবেন?')">@csrf @method('DELETE')<button style="background: none; font-size: 16px;">🗑️</button></form>
                     </td>
                 </tr>

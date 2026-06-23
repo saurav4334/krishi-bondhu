@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // Voice module: flush a small batch of queued/failed calls every minute.
+        // (Shared-hosting friendly — no long-running queue worker needed.)
+        $schedule->command('voice:dispatch')->everyMinute()->withoutOverlapping();
     }
 
     /**

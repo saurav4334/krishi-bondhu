@@ -46,6 +46,7 @@
                     <td class="inline-actions" style="white-space: nowrap;">
                         <a href="{{ route('admin.news.edit', $post) }}" title="এডিট">✏️</a>
                         <form method="POST" action="{{ route('admin.news.sms', $post) }}" onsubmit="return confirm('কৃষকদের SMS পাঠাবেন?')">@csrf<button title="SMS পাঠান">📲</button></form>
+                        <form method="POST" action="{{ route('admin.news.voice', $post) }}" onsubmit="return confirm('কৃষকদের ভয়েস কল (সরকারি বিজ্ঞপ্তি) পাঠাবেন?')">@csrf<button title="ভয়েস কল পাঠান">📞</button></form>
                         <form method="POST" action="{{ route('admin.news.destroy', $post) }}" onsubmit="return confirm('মুছবেন?')">@csrf @method('DELETE')<button title="মুছুন">🗑️</button></form>
                     </td>
                 </tr>
