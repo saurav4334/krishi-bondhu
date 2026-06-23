@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VoiceTemplate extends Model
 {
-    protected $fillable = ['type', 'title', 'start_text', 'question_text', 'end_text', 'dtmf_options', 'status'];
+    protected $fillable = ['type', 'title', 'start_text', 'question_text', 'end_text', 'voice_type', 'language_code', 'dtmf_options', 'status'];
 
     protected $casts = [
         'dtmf_options' => 'array',
@@ -22,8 +22,9 @@ class VoiceTemplate extends Model
         'govt_circular' => 'সরকারি বিজ্ঞপ্তি ভয়েস অ্যালার্ট',
     ];
 
+    /** The active template used when sending a call for this feature. */
     public static function forType(string $type): ?self
     {
-        return static::where('type', $type)->where('status', true)->first();
+        return static::where('type', $type)->where('status', true)->orderBy('id')->first();
     }
 }

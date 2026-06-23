@@ -65,26 +65,40 @@ class VoiceController extends Controller
         return back()->with('success', 'ভয়েস সেটিংস সংরক্ষিত হয়েছে।');
     }
 
-    public function updateTemplate(Request $request, VoiceTemplate $template): RedirectResponse
+    /** Create a new voice template. */
+    public function storeTemplate(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
-            'title' => ['required', 'string', 'max:120'],
-            'start_text' => ['nullable', 'string', 'max:500'],
-            'question_text' => ['required', 'string', 'max:1000'],
-            'end_text' => ['nullable', 'string', 'max:500'],
-            'dtmf_options' => ['nullable', 'string'],
-            'status' => ['nullable', 'boolean'],
-        ], [
-            'question_text.required' => 'প্রশ্ন/মূল বার্তা দিন',
+        $validated = $this->validateTemplate($request, requireType: true);
+        $dtmf = $this->parseDtmf($request->input('dtmf_options'), []);
+        if ($dtmf === false) {
+            return back()->with('error', 'DTMF অপশন সঠিক JSON নয়।')->withInput();
+        }
+
+        $template = VoiceTemplate::create([
+            'type' => $validated['type'],
+            'title' => $validated['title'],
+            'start_text' => $validated['start_text'] ?? null,
+            'question_text' => $validated['question_text'],
+            'end_text' => $validated['end_text'] ?? null,
+            'voice_type' => $validated['voice_type'] ?? null,
+            'language_code' => $validated['language_code'] ?? null,
+            'dtmf_options' => $dtmf,
+            'status' => $request->boolean('status'),
         ]);
 
-        $dtmf = $template->dtmf_options;
-        if (! empty($validated['dtmf_options'])) {
-            $decoded = json_decode($validated['dtmf_options'], true);
-            if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
-                return back()->with('error', 'DTMF অপশন সঠিক JSON নয়।')->withInput();
-            }
-            $dtmf = $decoded;
+        if ($template->status) {
+            $this->deactivateSiblings($template);
+        }
+
+        return back()->with('success', 'নতুন টেমপ্লেট তৈরি হয়েছে।');
+    }
+
+    public function updateTemplate(Request $request, VoiceTemplate $template): RedirectResponse
+    {
+        $validated = $this->validateTemplate($request, requireType: false);
+        $dtmf = $this->parseDtmf($request->input('dtmf_options'), $template->dtmf_options ?? []);
+        if ($dtmf === false) {
+            return back()->with('error', 'DTMF অপশন সঠিক JSON নয়।')->withInput();
         }
 
         $template->update([
@@ -92,11 +106,75 @@ class VoiceController extends Controller
             'start_text' => $validated['start_text'] ?? null,
             'question_text' => $validated['question_text'],
             'end_text' => $validated['end_text'] ?? null,
+            'voice_type' => $validated['voice_type'] ?? null,
+            'language_code' => $validated['language_code'] ?? null,
             'dtmf_options' => $dtmf,
             'status' => $request->boolean('status'),
         ]);
 
+        if ($template->status) {
+            $this->deactivateSiblings($template);
+        }
+
         return back()->with('success', 'টেমপ্লেট আপডেট হয়েছে।');
+    }
+
+    /** Activate / deactivate a template (only one active per feature type). */
+    public function toggleTemplate(VoiceTemplate $template): RedirectResponse
+    {
+        $template->update(['status' => ! $template->status]);
+        if ($template->status) {
+            $this->deactivateSiblings($template);
+        }
+
+        return back()->with('success', $template->status ? 'টেমপ্লেট সক্রিয় করা হয়েছে।' : 'টেমপ্লেট নিষ্ক্রিয় করা হয়েছে।');
+    }
+
+    public function destroyTemplate(VoiceTemplate $template): RedirectResponse
+    {
+        $template->delete();
+
+        return back()->with('success', 'টেমপ্লেট মুছে ফেলা হয়েছে।');
+    }
+
+    protected function validateTemplate(Request $request, bool $requireType): array
+    {
+        return $request->validate([
+            'type' => [$requireType ? 'required' : 'nullable', Rule::in(array_keys(VoiceTemplate::TYPES))],
+            'title' => ['required', 'string', 'max:120'],
+            'start_text' => ['nullable', 'string', 'max:500'],
+            'question_text' => ['required', 'string', 'max:1000'],
+            'end_text' => ['nullable', 'string', 'max:500'],
+            'voice_type' => ['nullable', 'in:male,female'],
+            'language_code' => ['nullable', 'string', 'max:8'],
+            'dtmf_options' => ['nullable', 'string'],
+            'status' => ['nullable', 'boolean'],
+        ], [
+            'type.required' => 'ফিচার টাইপ নির্বাচন করুন',
+            'title.required' => 'টেমপ্লেটের নাম দিন',
+            'question_text.required' => 'প্রশ্ন/মূল বার্তা দিন',
+        ]);
+    }
+
+    /** Decode a DTMF JSON string. Returns array, or false on invalid JSON. */
+    protected function parseDtmf(?string $json, array $fallback): array|false
+    {
+        if (empty($json)) {
+            return $fallback;
+        }
+        $decoded = json_decode($json, true);
+        if (json_last_error() !== JSON_ERROR_NONE || ! is_array($decoded)) {
+            return false;
+        }
+
+        return $decoded;
+    }
+
+    protected function deactivateSiblings(VoiceTemplate $template): void
+    {
+        VoiceTemplate::where('type', $template->type)
+            ->where('id', '!=', $template->id)
+            ->update(['status' => false]);
     }
 
     public function sendTest(Request $request): RedirectResponse
@@ -138,6 +216,14 @@ class VoiceController extends Controller
         $sent = $this->voice->processBatch();
 
         return back()->with('success', "{$sent} টি সারিবদ্ধ/ব্যর্থ কল প্রক্রিয়া করা হয়েছে।");
+    }
+
+    /** Retry a single call (e.g. a failed one) immediately. */
+    public function retryCall(VoiceCallLog $log): RedirectResponse
+    {
+        $status = $this->voice->sendLog($log);
+
+        return back()->with('success', "কল পুনরায় চেষ্টা — স্ট্যাটাস: {$status}");
     }
 
     public function markCallbackDone(VoiceCallbackRequest $callback): RedirectResponse

@@ -172,13 +172,17 @@ Route::middleware('auth')->group(function () {
         Route::post('/sms/test', [AdminSmsController::class, 'sendTest'])->name('sms.test');
         Route::post('/sms/broadcast', [AdminSmsController::class, 'broadcast'])->name('sms.broadcast');
 
-        // Protiddhoni Voice module: settings, templates, test call, campaign, logs, retry
+        // Protiddhoni Voice module: settings, templates (CRUD), test call, campaign, logs, retry
         Route::get('/voice', [AdminVoiceController::class, 'index'])->name('voice.index');
         Route::post('/voice/settings', [AdminVoiceController::class, 'updateSettings'])->name('voice.settings');
+        Route::post('/voice/templates', [AdminVoiceController::class, 'storeTemplate'])->name('voice.templates.store');
         Route::post('/voice/templates/{template}', [AdminVoiceController::class, 'updateTemplate'])->name('voice.templates.update');
+        Route::patch('/voice/templates/{template}/toggle', [AdminVoiceController::class, 'toggleTemplate'])->name('voice.templates.toggle');
+        Route::delete('/voice/templates/{template}', [AdminVoiceController::class, 'destroyTemplate'])->name('voice.templates.destroy');
         Route::post('/voice/test', [AdminVoiceController::class, 'sendTest'])->name('voice.test');
         Route::post('/voice/campaign', [AdminVoiceController::class, 'campaign'])->name('voice.campaign');
         Route::post('/voice/retry', [AdminVoiceController::class, 'retry'])->name('voice.retry');
+        Route::post('/voice/logs/{log}/retry', [AdminVoiceController::class, 'retryCall'])->name('voice.logs.retry');
         Route::patch('/voice/callbacks/{callback}/done', [AdminVoiceController::class, 'markCallbackDone'])->name('voice.callbacks.done');
     });
 });

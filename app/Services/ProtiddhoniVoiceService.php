@@ -122,8 +122,8 @@ class ProtiddhoniVoiceService
             'request_id' => $requestId,
             'sender' => $settings->sender ?: config('services.protiddhoni.sender'),
             'phone_numbers' => [$phone],
-            'voice' => $settings->default_voice ?: 'female',
-            'language_code' => $settings->language_code ?: 'bn',
+            'voice' => ($tpl['voice_type'] ?? null) ?: ($settings->default_voice ?: 'female'),
+            'language_code' => ($tpl['language_code'] ?? null) ?: ($settings->language_code ?: 'bn'),
             'start_texts' => array_values(array_filter([$this->render($tpl['start_text'] ?? '', $vars)])),
             'question_texts' => [$this->render($tpl['question_text'] ?? '', $vars)],
             'end_texts' => array_values(array_filter([$this->render($tpl['end_text'] ?? '', $vars)])),
@@ -240,6 +240,8 @@ class ProtiddhoniVoiceService
                 'question_text' => $row->question_text,
                 'end_text' => $row->end_text,
                 'dtmf_options' => $row->dtmf_options ?? [],
+                'voice_type' => $row->voice_type,
+                'language_code' => $row->language_code,
             ];
         }
 
