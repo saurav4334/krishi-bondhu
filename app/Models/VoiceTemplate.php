@@ -16,10 +16,13 @@ class VoiceTemplate extends Model
     /** Feature types handled by the voice module. */
     public const TYPES = [
         'weather_alert' => 'স্মার্ট আবহাওয়া সতর্কতা',
-        'crop_lead' => 'ফসল বিক্রয় লিড নিশ্চিতকরণ',
-        'equipment_rental' => 'যন্ত্রপাতি ভাড়া নিশ্চিতকরণ',
-        'labor_match' => 'শ্রমিক সেবা ম্যাচিং',
-        'govt_circular' => 'সরকারি বিজ্ঞপ্তি ভয়েস অ্যালার্ট',
+        'crop_lead_confirmation' => 'ফসল বিক্রয় ক্রেতা আগ্রহ নিশ্চিতকরণ',
+        'equipment_rental_confirmation' => 'কৃষি সরঞ্জাম বুকিং নিশ্চিতকরণ',
+        'labor_match' => 'কৃষি শ্রমিক কাজের ম্যাচিং',
+        'government_circular' => 'সরকারি কৃষি বিজ্ঞপ্তি ভয়েস অ্যালার্ট',
+        'expert_callback' => 'কৃষি বিশেষজ্ঞ কলব্যাক অনুরোধ',
+        'market_price_alert' => 'বাজার দর ভয়েস অ্যালার্ট',
+        'equipment_inquiry' => 'কৃষি সরঞ্জাম ক্রেতা আগ্রহ',
     ];
 
     /** The active template used when sending a call for this feature. */

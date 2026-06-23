@@ -30,11 +30,14 @@ class ProtiddhoniVoiceService
 
     /** DTMF keys (per feature) that create a follow-up VoiceCallbackRequest. */
     protected array $actionKeys = [
-        'weather_alert' => ['2'],       // expert callback requested
-        'crop_lead' => ['1'],           // send buyer/contact info
-        'equipment_rental' => ['1', '2'], // booking confirmed / rejected
-        'labor_match' => ['1'],         // interested
-        'govt_circular' => ['1'],       // details requested
+        'weather_alert' => ['2'],                  // expert callback requested
+        'crop_lead_confirmation' => ['1', '3'],    // send buyer info / contact later
+        'equipment_rental_confirmation' => ['1', '2'], // booking confirmed / cancelled
+        'labor_match' => ['1', '3'],               // interested / details later
+        'government_circular' => ['2'],            // callback for application help
+        'expert_callback' => ['1'],                // confirm expert callback
+        'market_price_alert' => [],                // informational only
+        'equipment_inquiry' => ['1', '3'],         // send buyer info / contact later
     ];
 
     // ---------------------------------------------------------------------
@@ -48,12 +51,12 @@ class ProtiddhoniVoiceService
 
     public function sendCropLeadConfirmation(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
     {
-        return $this->dispatch('crop_lead', $phone, $vars, $userId, $relatedId, $immediate);
+        return $this->dispatch('crop_lead_confirmation', $phone, $vars, $userId, $relatedId, $immediate);
     }
 
     public function sendEquipmentRentalConfirmation(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
     {
-        return $this->dispatch('equipment_rental', $phone, $vars, $userId, $relatedId, $immediate);
+        return $this->dispatch('equipment_rental_confirmation', $phone, $vars, $userId, $relatedId, $immediate);
     }
 
     public function sendLaborMatchCall(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
@@ -63,7 +66,22 @@ class ProtiddhoniVoiceService
 
     public function sendGovernmentCircularAlert(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
     {
-        return $this->dispatch('govt_circular', $phone, $vars, $userId, $relatedId, $immediate);
+        return $this->dispatch('government_circular', $phone, $vars, $userId, $relatedId, $immediate);
+    }
+
+    public function sendExpertCallback(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
+    {
+        return $this->dispatch('expert_callback', $phone, $vars, $userId, $relatedId, $immediate);
+    }
+
+    public function sendMarketPriceAlert(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
+    {
+        return $this->dispatch('market_price_alert', $phone, $vars, $userId, $relatedId, $immediate);
+    }
+
+    public function sendEquipmentInquiry(string $phone, array $vars = [], ?int $userId = null, $relatedId = null, bool $immediate = false): VoiceCallLog
+    {
+        return $this->dispatch('equipment_inquiry', $phone, $vars, $userId, $relatedId, $immediate);
     }
 
     /** Admin test call — fires immediately and returns the log. */
@@ -276,48 +294,90 @@ class ProtiddhoniVoiceService
      */
     public const DEFAULTS = [
         'weather_alert' => [
-            'start_text' => 'হ্যালো {{name}}।',
-            'question_text' => 'আপনার এলাকা {{district}}-এ আগামী ২৪ ঘন্টার মধ্যে ভারী বৃষ্টির সম্ভাবনা রয়েছে। ফসল নিরাপদ রাখতে ১ চাপুন, কৃষি বিশেষজ্ঞের সাথে কথা বলতে ২ চাপুন।',
+            'title' => 'স্মার্ট আবহাওয়া সতর্কতা',
+            'start_text' => 'হ্যালো {{name}}, আপনি {{district}} এলাকার কৃষি-বন্ধু ব্যবহারকারী।',
+            'question_text' => 'আপনার এলাকায় আবহাওয়া সতর্কতা রয়েছে। নিরাপত্তা পরামর্শ শুনতে ১ চাপুন, কৃষি বিশেষজ্ঞের কলব্যাক চাইলে ২ চাপুন, পরে শুনতে চাইলে ৩ চাপুন।',
             'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর সাথে থাকুন।',
             'dtmf_options' => [
-                ['key' => '1', 'option_type' => 'voice', 'texts' => ['নিরাপত্তা পরামর্শ গ্রহণ করা হয়েছে। ধন্যবাদ।']],
-                ['key' => '2', 'option_type' => 'voice', 'texts' => ['একজন কৃষি বিশেষজ্ঞ শীঘ্রই আপনাকে কল করবেন।']],
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আগামী ২৪ ঘণ্টা ফসল নিরাপদ স্থানে রাখুন, জমির পানি নিষ্কাশনের ব্যবস্থা করুন এবং ঝড়-বৃষ্টির সময় জমিতে কাজ করা থেকে বিরত থাকুন।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['আপনার কৃষি বিশেষজ্ঞ কলব্যাক অনুরোধ গ্রহণ করা হয়েছে। আমাদের প্রতিনিধি দ্রুত যোগাযোগ করবে।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। আমরা আপনাকে পরে আবার গুরুত্বপূর্ণ সতর্কতা জানাবো।']],
             ],
         ],
-        'crop_lead' => [
-            'start_text' => 'হ্যালো {{name}}।',
-            'question_text' => 'আপনার {{crop}} বিজ্ঞাপনে একজন ক্রেতা আগ্রহ দেখিয়েছেন। ক্রেতার তথ্য পেতে ১ চাপুন, আগ্রহী না হলে ২ চাপুন।',
-            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর সাথে থাকুন।',
+        'crop_lead_confirmation' => [
+            'title' => 'ফসল বিক্রয় ক্রেতা আগ্রহ নিশ্চিতকরণ',
+            'start_text' => 'হ্যালো {{name}}, আপনার {{crop}} বিক্রয় বিজ্ঞাপনে একজন ক্রেতা আগ্রহ দেখিয়েছেন।',
+            'question_text' => 'ক্রেতার তথ্য পেতে ১ চাপুন, এই আগ্রহ বাতিল করতে ২ চাপুন, পরে যোগাযোগ করতে চাইলে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধু আপনার ফসল বিক্রয়ে সহায়তা করবে।',
             'dtmf_options' => [
-                ['key' => '1', 'option_type' => 'voice', 'texts' => ['ক্রেতার যোগাযোগ তথ্য আপনাকে এসএমএস করা হবে।']],
-                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে, ধন্যবাদ।']],
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার অনুরোধ গ্রহণ করা হয়েছে। ক্রেতার যোগাযোগ তথ্য আপনাকে অ্যাপ নোটিফিকেশন বা এস এম এস এর মাধ্যমে পাঠানো হবে।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। এই ক্রেতার আগ্রহ বাতিল হিসেবে সংরক্ষণ করা হয়েছে।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। পরে যোগাযোগ করার জন্য অনুরোধটি সংরক্ষণ করা হয়েছে।']],
             ],
         ],
-        'equipment_rental' => [
-            'start_text' => 'হ্যালো {{name}}।',
-            'question_text' => 'আপনার {{product}} ভাড়ার একটি বুকিং অনুরোধ এসেছে। বুকিং কনফার্ম করতে ১ চাপুন, বাতিল করতে ২ চাপুন।',
-            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর সাথে থাকুন।',
+        'equipment_rental_confirmation' => [
+            'title' => 'কৃষি সরঞ্জাম বুকিং নিশ্চিতকরণ',
+            'start_text' => 'হ্যালো {{name}}, আপনার {{product}} এর জন্য একটি বুকিং অনুরোধ এসেছে।',
+            'question_text' => 'বুকিং কনফার্ম করতে ১ চাপুন, বুকিং বাতিল করতে ২ চাপুন, বুকিং সম্পর্কে পরে সিদ্ধান্ত নিতে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। কৃষি সরঞ্জাম সেবায় কৃষি-বন্ধুর সাথে থাকুন।',
             'dtmf_options' => [
-                ['key' => '1', 'option_type' => 'voice', 'texts' => ['বুকিং নিশ্চিত করা হয়েছে।']],
-                ['key' => '2', 'option_type' => 'voice', 'texts' => ['বুকিং বাতিল করা হয়েছে।']],
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার বুকিং কনফার্ম করা হয়েছে। বুকিং তথ্য সংশ্লিষ্ট ব্যবহারকারীকে জানিয়ে দেওয়া হবে।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['আপনার বুকিং বাতিল করা হয়েছে। আমরা সংশ্লিষ্ট ব্যবহারকারীকে জানিয়ে দেব।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। বুকিংটি অপেক্ষমান অবস্থায় রাখা হয়েছে।']],
             ],
         ],
         'labor_match' => [
-            'start_text' => 'হ্যালো {{name}}।',
-            'question_text' => 'আপনার এলাকা {{district}}-এ কৃষি শ্রমিকের নতুন একটি কাজ পাওয়া গেছে। আগ্রহী হলে ১ চাপুন, না হলে ২ চাপুন।',
-            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর সাথে থাকুন।',
+            'title' => 'কৃষি শ্রমিক কাজের ম্যাচিং',
+            'start_text' => 'হ্যালো {{name}}, আপনার এলাকায় একটি নতুন কৃষি শ্রমিক কাজ পাওয়া গেছে।',
+            'question_text' => 'এই কাজের জন্য আগ্রহী হলে ১ চাপুন, আগ্রহী না হলে ২ চাপুন, বিস্তারিত পরে জানতে চাইলে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধু শ্রমিক সেবার সাথে থাকুন।',
             'dtmf_options' => [
-                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার আগ্রহ গ্রহণ করা হয়েছে। শীঘ্রই বিস্তারিত জানানো হবে।']],
-                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে, ধন্যবাদ।']],
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার আগ্রহ গ্রহণ করা হয়েছে। কাজের মালিককে আপনার তথ্য জানিয়ে দেওয়া হবে।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। এই কাজের জন্য আপনাকে আগ্রহী হিসেবে ধরা হবে না।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। কাজের বিস্তারিত পরে জানার অনুরোধ সংরক্ষণ করা হয়েছে।']],
             ],
         ],
-        'govt_circular' => [
-            'start_text' => 'হ্যালো {{name}}।',
-            'question_text' => 'কৃষি বিষয়ক একটি সরকারি বিজ্ঞপ্তি প্রকাশিত হয়েছে। বিস্তারিত শুনতে ১ চাপুন, পরে শুনতে ২ চাপুন।',
-            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর সাথে থাকুন।',
+        'government_circular' => [
+            'title' => 'সরকারি কৃষি বিজ্ঞপ্তি ভয়েস অ্যালার্ট',
+            'start_text' => 'হ্যালো {{name}}, কৃষি-বন্ধু থেকে একটি গুরুত্বপূর্ণ সরকারি কৃষি বিজ্ঞপ্তি রয়েছে।',
+            'question_text' => 'বিজ্ঞপ্তির বিস্তারিত শুনতে ১ চাপুন, আবেদন বা সহায়তার জন্য কলব্যাক চাইলে ২ চাপুন, পরে শুনতে চাইলে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। সরকারি কৃষি তথ্য পেতে কৃষি-বন্ধুর সাথে থাকুন।',
             'dtmf_options' => [
-                ['key' => '1', 'option_type' => 'voice', 'texts' => ['বিস্তারিত তথ্য আপনাকে জানানো হবে।']],
-                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে, পরে আবার জানানো হবে।']],
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['সরকারি কৃষি সহায়তা বা বিজ্ঞপ্তির বিস্তারিত জানতে আপনার নিকটস্থ কৃষি অফিসে যোগাযোগ করুন অথবা কৃষি-বন্ধু অ্যাপের কৃষি সংবাদ বিভাগ দেখুন।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['আপনার কলব্যাক অনুরোধ গ্রহণ করা হয়েছে। আমাদের প্রতিনিধি বিস্তারিত তথ্য জানাতে যোগাযোগ করবে।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। আমরা আপনাকে পরে আবার এই গুরুত্বপূর্ণ বিজ্ঞপ্তি জানাবো।']],
+            ],
+        ],
+        'expert_callback' => [
+            'title' => 'কৃষি বিশেষজ্ঞ কলব্যাক অনুরোধ',
+            'start_text' => 'হ্যালো {{name}}, আপনার কৃষি বিশেষজ্ঞ সহায়তা অনুরোধ গ্রহণ করা হয়েছে।',
+            'question_text' => 'বিশেষজ্ঞের কলব্যাক নিশ্চিত করতে ১ চাপুন, অনুরোধ বাতিল করতে ২ চাপুন।',
+            'end_text' => 'ধন্যবাদ। কৃষি-বন্ধুর বিশেষজ্ঞ সেবার সাথে থাকুন।',
+            'dtmf_options' => [
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার বিশেষজ্ঞ কলব্যাক অনুরোধ নিশ্চিত করা হয়েছে। আমাদের কৃষি বিশেষজ্ঞ দ্রুত যোগাযোগ করবেন।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['আপনার বিশেষজ্ঞ কলব্যাক অনুরোধ বাতিল করা হয়েছে।']],
+            ],
+        ],
+        'market_price_alert' => [
+            'title' => 'বাজার দর ভয়েস অ্যালার্ট',
+            'start_text' => 'হ্যালো {{name}}, আজকের {{district}} এলাকার বাজার দর আপডেট রয়েছে।',
+            'question_text' => 'আজকের ফসলের বাজার দর শুনতে ১ চাপুন, ফসল বিক্রয় বিজ্ঞাপন দিতে ২ চাপুন, পরে শুনতে চাইলে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। বাজার দর জানতে কৃষি-বন্ধুর সাথে থাকুন।',
+            'dtmf_options' => [
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আজকের বাজার দর জানতে কৃষি-বন্ধু অ্যাপের বাজার দর বিভাগ দেখুন। নিয়মিত বাজার দর আপডেট পেতে অ্যাপ ব্যবহার করুন।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ফসল বিক্রয় বিজ্ঞাপন দিতে কৃষি-বন্ধু অ্যাপের ফসল বিক্রয় বিভাগ ব্যবহার করুন।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। আমরা আপনাকে পরে বাজার দর আপডেট জানাবো।']],
+            ],
+        ],
+        'equipment_inquiry' => [
+            'title' => 'কৃষি সরঞ্জাম ক্রেতা আগ্রহ',
+            'start_text' => 'হ্যালো {{name}}, আপনার {{product}} পণ্যে একজন ক্রেতা আগ্রহ দেখিয়েছেন।',
+            'question_text' => 'ক্রেতার তথ্য পেতে ১ চাপুন, আগ্রহ বাতিল করতে ২ চাপুন, পরে যোগাযোগ করতে চাইলে ৩ চাপুন।',
+            'end_text' => 'ধন্যবাদ। কৃষি সরঞ্জাম বাজারে কৃষি-বন্ধুর সাথে থাকুন।',
+            'dtmf_options' => [
+                ['key' => '1', 'option_type' => 'voice', 'texts' => ['আপনার অনুরোধ গ্রহণ করা হয়েছে। ক্রেতার যোগাযোগ তথ্য অ্যাপ নোটিফিকেশন বা এস এম এস এর মাধ্যমে পাঠানো হবে।']],
+                ['key' => '2', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। এই ক্রেতার আগ্রহ বাতিল করা হয়েছে।']],
+                ['key' => '3', 'option_type' => 'voice', 'texts' => ['ঠিক আছে। পরে যোগাযোগ করার অনুরোধ সংরক্ষণ করা হয়েছে।']],
             ],
         ],
     ];

@@ -195,7 +195,7 @@ class VoiceController extends Controller
     public function campaign(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'feature' => ['required', 'in:weather_alert,govt_circular,labor_match'],
+            'feature' => ['required', 'in:weather_alert,government_circular,labor_match,market_price_alert'],
             'district' => ['required', 'string', 'max:50'],
         ], ['district.required' => 'জেলা নির্বাচন করুন']);
 

@@ -146,8 +146,9 @@
                     <label>ফিচার</label>
                     <select name="feature" required>
                         <option value="weather_alert">স্মার্ট আবহাওয়া সতর্কতা</option>
-                        <option value="govt_circular">সরকারি বিজ্ঞপ্তি</option>
-                        <option value="labor_match">শ্রমিক সেবা ম্যাচিং</option>
+                        <option value="government_circular">সরকারি কৃষি বিজ্ঞপ্তি</option>
+                        <option value="labor_match">কৃষি শ্রমিক কাজের ম্যাচিং</option>
+                        <option value="market_price_alert">বাজার দর অ্যালার্ট</option>
                     </select>
                 </div>
                 <div class="form-group">
