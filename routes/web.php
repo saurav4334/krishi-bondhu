@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\Admin\AiChatController as AdminAiChatController;
 use App\Http\Controllers\Admin\EquipmentController as AdminEquipmentController;
 use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\SmsController as AdminSmsController;
 use App\Http\Controllers\Admin\VoiceController as AdminVoiceController;
 use App\Http\Controllers\Admin\WeatherAlertController as AdminWeatherAlertController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpertController;
@@ -63,6 +65,9 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // কৃষি AI সহকারী — floating chatbot (Gemini)
+    Route::post('/ai-chat', [ChatController::class, 'send'])->name('chat.send');
 
     // AI Disease Scan
     Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');
@@ -185,5 +190,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/voice/retry', [AdminVoiceController::class, 'retry'])->name('voice.retry');
         Route::post('/voice/logs/{log}/retry', [AdminVoiceController::class, 'retryCall'])->name('voice.logs.retry');
         Route::patch('/voice/callbacks/{callback}/done', [AdminVoiceController::class, 'markCallbackDone'])->name('voice.callbacks.done');
+
+        // কৃষি AI সহকারী: chat history, search, top topics, settings
+        Route::get('/ai-chat', [AdminAiChatController::class, 'index'])->name('ai.index');
+        Route::post('/ai-chat/settings', [AdminAiChatController::class, 'updateSettings'])->name('ai.settings');
     });
 });

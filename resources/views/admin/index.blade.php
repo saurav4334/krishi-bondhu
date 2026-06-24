@@ -29,6 +29,7 @@
     <a href="{{ route('admin.weather.index') }}" class="btn btn-secondary" style="justify-content: center;">🌦️ আবহাওয়া</a>
     <a href="{{ route('admin.sms.index') }}" class="btn btn-secondary" style="justify-content: center;">📲 SMS</a>
     <a href="{{ route('admin.voice.index') }}" class="btn btn-secondary" style="justify-content: center;">📞 ভয়েস কল</a>
+    <a href="{{ route('admin.ai.index') }}" class="btn btn-secondary" style="justify-content: center;">🤖 AI চ্যাট</a>
 </div>
 
 <div class="card">

@@ -158,6 +158,8 @@
             প্রোফাইল
         </a>
     </nav>
+
+    @include('partials.ai-chat')
     @else
         @yield('content')
     @endauth
