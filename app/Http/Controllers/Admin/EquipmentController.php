@@ -91,6 +91,21 @@ class EquipmentController extends Controller
         return back()->with('success', 'ক্যাটাগরি যুক্ত হয়েছে।');
     }
 
+    public function updateCategory(Request $request, EquipmentCategory $category): RedirectResponse
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:60'],
+            'icon' => ['nullable', 'string', 'max:16'],
+        ], ['name.required' => 'ক্যাটাগরির নাম দিন']);
+
+        $category->update([
+            'name' => $validated['name'],
+            'icon' => $validated['icon'] ?: $category->icon,
+        ]);
+
+        return back()->with('success', 'ক্যাটাগরি আপডেট হয়েছে।');
+    }
+
     public function toggleCategory(EquipmentCategory $category): RedirectResponse
     {
         $category->update(['status' => $category->status === 'active' ? 'inactive' : 'active']);

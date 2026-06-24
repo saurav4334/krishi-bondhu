@@ -64,8 +64,8 @@
         <div class="icon" style="background: var(--brown-50);">🛒</div>
         ফসল বিক্রয়
     </a>
-    <a href="{{ route('equipment.index') }}" class="quick-btn">
-        <div class="icon" style="background: var(--amber-50);">🚜</div>
+    <a href="{{ route('equipment.index') }}" class="quick-btn" title="কৃষি যন্ত্রপাতি, বীজ, সার ও কৃষি উপকরণ ক্রয়-বিক্রয়">
+        <div class="icon" style="background: var(--amber-50);">🛠️</div>
         কৃষি সরঞ্জাম
     </a>
     <a href="{{ route('experts.index') }}" class="quick-btn">

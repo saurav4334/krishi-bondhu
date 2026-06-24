@@ -144,6 +144,7 @@ Route::middleware('auth')->group(function () {
         Route::delete('/equipment/{product}/reject', [AdminEquipmentController::class, 'reject'])->name('equipment.reject');
         Route::patch('/equipment/{product}/feature', [AdminEquipmentController::class, 'feature'])->name('equipment.feature');
         Route::post('/equipment/categories', [AdminEquipmentController::class, 'storeCategory'])->name('equipment.categories.store');
+        Route::patch('/equipment/categories/{category}', [AdminEquipmentController::class, 'updateCategory'])->name('equipment.categories.update');
         Route::patch('/equipment/categories/{category}/toggle', [AdminEquipmentController::class, 'toggleCategory'])->name('equipment.categories.toggle');
         Route::delete('/equipment/categories/{category}', [AdminEquipmentController::class, 'deleteCategory'])->name('equipment.categories.delete');
 

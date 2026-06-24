@@ -26,7 +26,7 @@
 </style>
 
 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-    <h2 class="page-title" style="margin: 0; border: none; padding: 0;">🚜 কৃষি সরঞ্জাম</h2>
+    <h2 class="page-title" style="margin: 0; border: none; padding: 0;">🛠️ কৃষি সরঞ্জাম</h2>
     <a href="{{ route('equipment.create') }}" class="btn btn-primary">+ পণ্য</a>
 </div>
 

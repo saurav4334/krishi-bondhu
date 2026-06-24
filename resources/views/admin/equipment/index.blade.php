@@ -45,6 +45,7 @@
                         <td>{{ $cat->products_count }}</td>
                         <td>@if($cat->status === 'active')<span class="badge badge-green">সক্রিয়</span>@else<span class="badge badge-red">নিষ্ক্রিয়</span>@endif</td>
                         <td class="inline-actions" style="white-space: nowrap;">
+                            <button type="button" onclick="editEqCat({{ $cat->id }}, @js($cat->name))" title="সম্পাদনা">✏️</button>
                             <form method="POST" action="{{ route('admin.equipment.categories.toggle', $cat) }}">@csrf @method('PATCH')<button title="সক্রিয়/নিষ্ক্রিয়">{{ $cat->status === 'active' ? '🚫' : '✅' }}</button></form>
                             <form method="POST" action="{{ route('admin.equipment.categories.delete', $cat) }}" onsubmit="return confirm('{{ $cat->parent_id ? 'মুছবেন?' : 'মূল ক্যাটাগরি ও এর সব উপ-ক্যাটাগরি মুছবেন?' }}')">@csrf @method('DELETE')<button title="মুছুন">🗑️</button></form>
                         </td>
@@ -91,4 +92,23 @@
     </table>
     <div style="margin-top: .75rem;">{{ $products->links() }}</div>
 </div>
+
+{{-- Shared form for inline category rename --}}
+<form method="POST" id="edit-eqcat-form" action="">
+    @csrf @method('PATCH')
+    <input type="hidden" name="name" id="edit-eqcat-name">
+</form>
+
+@push('scripts')
+<script>
+    function editEqCat(id, current) {
+        var name = prompt('নতুন ক্যাটাগরির নাম:', current);
+        if (name === null || name.trim() === '') return;
+        var form = document.getElementById('edit-eqcat-form');
+        form.action = '{{ url('admin/equipment/categories') }}/' + id;
+        document.getElementById('edit-eqcat-name').value = name.trim();
+        form.submit();
+    }
+</script>
+@endpush
 @endsection
