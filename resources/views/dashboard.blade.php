@@ -84,6 +84,10 @@
         <div class="icon" style="background: var(--green-50);">📰</div>
         কৃষি সংবাদ
     </a>
+    <a href="{{ route('knowledge.index') }}" class="quick-btn">
+        <div class="icon" style="background: var(--green-50);">📚</div>
+        জ্ঞানভান্ডার
+    </a>
     <a href="{{ route('weather.index') }}" class="quick-btn">
         <div class="icon" style="background: var(--sky-50);">🌦️</div>
         আবহাওয়া

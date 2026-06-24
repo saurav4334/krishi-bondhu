@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AiChatController as AdminAiChatController;
 use App\Http\Controllers\Admin\EquipmentController as AdminEquipmentController;
+use App\Http\Controllers\Admin\KnowledgeController as AdminKnowledgeController;
 use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
 use App\Http\Controllers\Admin\NewsController as AdminNewsController;
 use App\Http\Controllers\Admin\SmsController as AdminSmsController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\WeatherAlertController as AdminWeatherAlertContro
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\KnowledgeController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\LaborController;
@@ -66,8 +68,13 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // কৃষি AI সহকারী — floating chatbot (Gemini)
+    // কৃষি AI সহকারী — floating chatbot (Knowledge Base first, Gemini fallback)
     Route::post('/ai-chat', [ChatController::class, 'send'])->name('chat.send');
+
+    // কৃষি জ্ঞানভান্ডার (Knowledge Base) — farmer browse
+    Route::get('/knowledge', [KnowledgeController::class, 'index'])->name('knowledge.index');
+    Route::get('/knowledge/{article}', [KnowledgeController::class, 'show'])->name('knowledge.show');
+    Route::post('/knowledge/{article}/helpful', [KnowledgeController::class, 'helpful'])->name('knowledge.helpful');
 
     // AI Disease Scan
     Route::get('/scan', [ScanController::class, 'index'])->name('scan.index');
@@ -195,5 +202,19 @@ Route::middleware('auth')->group(function () {
         Route::get('/ai-chat', [AdminAiChatController::class, 'index'])->name('ai.index');
         Route::get('/ai-chat/test', [AdminAiChatController::class, 'test'])->name('ai.test');
         Route::post('/ai-chat/settings', [AdminAiChatController::class, 'updateSettings'])->name('ai.settings');
+
+        // কৃষি জ্ঞানভান্ডার: analytics, categories, articles, unanswered review
+        Route::get('/knowledge', [AdminKnowledgeController::class, 'index'])->name('knowledge.index');
+        Route::post('/knowledge/categories', [AdminKnowledgeController::class, 'storeCategory'])->name('knowledge.categories.store');
+        Route::patch('/knowledge/categories/{category}', [AdminKnowledgeController::class, 'updateCategory'])->name('knowledge.categories.update');
+        Route::patch('/knowledge/categories/{category}/toggle', [AdminKnowledgeController::class, 'toggleCategory'])->name('knowledge.categories.toggle');
+        Route::delete('/knowledge/categories/{category}', [AdminKnowledgeController::class, 'deleteCategory'])->name('knowledge.categories.delete');
+        Route::get('/knowledge/articles/create', [AdminKnowledgeController::class, 'createArticle'])->name('knowledge.articles.create');
+        Route::post('/knowledge/articles', [AdminKnowledgeController::class, 'storeArticle'])->name('knowledge.articles.store');
+        Route::get('/knowledge/articles/{article}/edit', [AdminKnowledgeController::class, 'editArticle'])->name('knowledge.articles.edit');
+        Route::patch('/knowledge/articles/{article}', [AdminKnowledgeController::class, 'updateArticle'])->name('knowledge.articles.update');
+        Route::delete('/knowledge/articles/{article}', [AdminKnowledgeController::class, 'deleteArticle'])->name('knowledge.articles.delete');
+        Route::post('/knowledge/unanswered/{question}/convert', [AdminKnowledgeController::class, 'convertUnanswered'])->name('knowledge.unanswered.convert');
+        Route::delete('/knowledge/unanswered/{question}', [AdminKnowledgeController::class, 'deleteUnanswered'])->name('knowledge.unanswered.delete');
     });
 });

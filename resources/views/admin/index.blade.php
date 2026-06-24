@@ -30,6 +30,7 @@
     <a href="{{ route('admin.sms.index') }}" class="btn btn-secondary" style="justify-content: center;">📲 SMS</a>
     <a href="{{ route('admin.voice.index') }}" class="btn btn-secondary" style="justify-content: center;">📞 ভয়েস কল</a>
     <a href="{{ route('admin.ai.index') }}" class="btn btn-secondary" style="justify-content: center;">🤖 AI চ্যাট</a>
+    <a href="{{ route('admin.knowledge.index') }}" class="btn btn-secondary" style="justify-content: center;">📚 জ্ঞানভান্ডার</a>
 </div>
 
 <div class="card">
