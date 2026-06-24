@@ -28,6 +28,26 @@
     <div><div class="n">{{ $stats['failed'] }}</div><div class="l">ব্যর্থ</div></div>
 </div>
 
+{{-- Gemini connection / model --}}
+<div class="card">
+    <h3>🔌 Gemini সংযোগ</h3>
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: .75rem; flex-wrap: wrap;">
+        <div style="font-size: 14px;">
+            বর্তমান Gemini মডেল:
+            <span class="badge badge-green" style="font-size: 13px;">{{ $currentModel }}</span>
+            @if($hasKey)
+                <span class="badge badge-green">API Key সেট আছে</span>
+            @else
+                <span class="badge badge-red">API Key নেই</span>
+            @endif
+        </div>
+        <a href="{{ route('admin.ai.test') }}" class="btn btn-secondary">🔍 Test Gemini Connection</a>
+    </div>
+    <p style="font-size: 12px; color: var(--text-muted); margin-top: .5rem;">
+        ডিফল্ট মডেল কাজ না করলে স্বয়ংক্রিয়ভাবে gemini-2.0-flash → gemini-1.5-pro চেষ্টা করা হয়; সফল মডেল ২৪ ঘণ্টা ক্যাশে থাকে।
+    </p>
+</div>
+
 {{-- Settings --}}
 <div class="card">
     <h3>⚙️ সেটিংস</h3>
@@ -52,9 +72,9 @@
         </div>
         <button type="submit" class="btn btn-primary btn-block">সেটিংস সংরক্ষণ করুন</button>
     </form>
-    @if(empty(config('services.gemini.api_key')))
+    @unless($hasKey)
         <p style="font-size: 12px; color: #7a5200; margin-top: .75rem;">⚠️ Gemini API Key সেট করা নেই (<code>GEMINI_API_KEY</code>) — উত্তর ডেমো মোডে দেওয়া হবে। লাইভ উত্তরের জন্য সার্ভারে কী যোগ করুন।</p>
-    @endif
+    @endunless
 </div>
 
 {{-- Top topics --}}

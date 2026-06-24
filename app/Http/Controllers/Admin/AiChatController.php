@@ -5,12 +5,17 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\AiChatLog;
 use App\Models\AiSetting;
+use App\Services\GeminiChatService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class AiChatController extends Controller
 {
+    public function __construct(protected GeminiChatService $ai)
+    {
+    }
+
     public function index(Request $request): View
     {
         $search = $request->input('q');
@@ -26,12 +31,22 @@ class AiChatController extends Controller
             'logs' => $logs,
             'search' => $search,
             'topics' => $this->topTopics(),
+            'currentModel' => $this->ai->currentModel(),
+            'hasKey' => ! empty(config('services.gemini.api_key')),
             'stats' => [
                 'total' => AiChatLog::count(),
                 'today' => AiChatLog::whereDate('created_at', today())->count(),
                 'failed' => AiChatLog::where('status', 'failed')->count(),
             ],
         ]);
+    }
+
+    /** Health check — "Test Gemini Connection" button / GET /admin/ai-chat/test. */
+    public function test(): RedirectResponse
+    {
+        $result = $this->ai->testConnection();
+
+        return back()->with($result['ok'] ? 'success' : 'error', $result['message']);
     }
 
     public function updateSettings(Request $request): RedirectResponse

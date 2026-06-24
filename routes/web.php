@@ -191,8 +191,9 @@ Route::middleware('auth')->group(function () {
         Route::post('/voice/logs/{log}/retry', [AdminVoiceController::class, 'retryCall'])->name('voice.logs.retry');
         Route::patch('/voice/callbacks/{callback}/done', [AdminVoiceController::class, 'markCallbackDone'])->name('voice.callbacks.done');
 
-        // কৃষি AI সহকারী: chat history, search, top topics, settings
+        // কৃষি AI সহকারী: chat history, search, top topics, settings, health check
         Route::get('/ai-chat', [AdminAiChatController::class, 'index'])->name('ai.index');
+        Route::get('/ai-chat/test', [AdminAiChatController::class, 'test'])->name('ai.test');
         Route::post('/ai-chat/settings', [AdminAiChatController::class, 'updateSettings'])->name('ai.settings');
     });
 });

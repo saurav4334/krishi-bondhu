@@ -118,10 +118,11 @@
                 return r.json().then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
             }).then(function (res) {
                 t.remove();
-                if (res.ok && res.data.answer) {
+                if (res.ok && res.data.ok && res.data.answer) {
                     bubble(res.data.answer, 'ai-bot');
                 } else {
-                    bubble(res.data.message || 'দুঃখিত, এখন উত্তর দেওয়া যাচ্ছে না। কিছুক্ষণ পরে আবার চেষ্টা করুন।', 'ai-err');
+                    // Detailed backend error (invalid key / model not found / rate limit / timeout)
+                    bubble(res.data.answer || res.data.message || 'দুঃখিত, এখন উত্তর দেওয়া যাচ্ছে না। কিছুক্ষণ পরে আবার চেষ্টা করুন।', 'ai-err');
                 }
             }).catch(function () {
                 t.remove();
