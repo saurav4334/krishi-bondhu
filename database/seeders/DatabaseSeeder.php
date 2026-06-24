@@ -181,6 +181,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             MarketplaceCategorySeeder::class,
             EquipmentCategorySeeder::class,
+            EquipmentProductSeeder::class,
             NewsSeeder::class,
             WeatherAlertSeeder::class,
             VoiceTemplateSeeder::class,
