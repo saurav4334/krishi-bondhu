@@ -35,18 +35,28 @@ class ChatController extends Controller
 
         $message = $validated['message'];
         $user = Auth::user();
+        $ip = $request->ip();
 
-        // ---- 1) Knowledge Base first (no API, no rate limit) ----
+        // Daily limit + today's Gemini usage — read live from AiSetting (no hardcoding).
+        $settings = AiSetting::current();
+        $limit = $user ? $settings->daily_limit : $settings->guest_limit;
+        $used = AiChatLog::geminiUsedToday($user?->id, $ip);
+        $usage = fn (int $u) => ['used' => $u, 'limit' => $limit];
+
+        // ---- 1) Knowledge Base first — NEVER consumes the Gemini limit ----
         $hit = $this->kb->search($message);
         if ($hit) {
             $this->kb->recordView($hit['article']);
-            $this->log($user?->id, $request->ip(), $message, $hit['article']->answer, 'knowledge_base', null, 'success');
+            $this->log($user?->id, $ip, $message, $hit['article']->answer, 'knowledge_base', null, 'success');
 
             return response()->json([
                 'ok' => true,
                 'source' => 'knowledge_base',
+                'source_label' => $hit['article']->source_label,
+                'source_url' => $hit['article']->source_url,
                 'question' => $message,
                 'answer' => $hit['article']->answer,
+                'usage' => $usage($used), // unchanged — KB is free
             ]);
         }
 
@@ -59,45 +69,41 @@ class ChatController extends Controller
             'status' => 'pending',
         ]);
 
-        $settings = AiSetting::current();
-
         // ---- 2) Gemini fallback (only if enabled) ----
         if ($settings->status) {
-            // Daily limit applies ONLY to Gemini calls (KB stays unlimited).
-            $limit = $user ? $settings->daily_limit : $settings->guest_limit;
-            $usedToday = AiChatLog::whereDate('created_at', today())
-                ->where('provider', 'gemini')
-                ->when($user, fn ($q) => $q->where('user_id', $user->id), fn ($q) => $q->where('ip', $request->ip()))
-                ->count();
-
-            if ($usedToday >= $limit) {
+            if ($used >= $limit) {
                 return response()->json([
                     'ok' => false,
                     'source' => 'limit',
                     'message' => "আজকের জন্য AI প্রশ্নের সীমা ({$limit}টি) শেষ হয়েছে। আগামীকাল আবার চেষ্টা করুন।",
+                    'usage' => $usage($used),
                 ], 429);
             }
 
             $result = $this->ai->ask($message);
-            $this->log($user?->id, $request->ip(), $message, $result['answer'], 'gemini', $result['model'], $result['status'], $result['tokens']);
+            // A Gemini call was made → it consumes exactly one from today's counter.
+            $this->log($user?->id, $ip, $message, $result['answer'], 'gemini', $result['model'], $result['status'], $result['tokens']);
 
             return response()->json([
                 'ok' => $result['status'] !== 'failed',
                 'source' => 'gemini',
+                'source_label' => $result['status'] === 'success' ? 'কৃষি AI (Gemini)' : null,
                 'question' => $message,
                 'answer' => $result['answer'],
+                'usage' => $usage($used + 1),
             ]);
         }
 
-        // ---- 3) Gemini disabled → expert fallback ----
+        // ---- 3) Gemini disabled → expert fallback (no limit consumed) ----
         $fallback = 'আপনার প্রশ্নটি আমাদের বিশেষজ্ঞ দলের কাছে পাঠানো হয়েছে। শীঘ্রই উত্তর জানানো হবে। জরুরি প্রয়োজনে অ্যাপের "বিশেষজ্ঞ" বিভাগে যোগাযোগ করুন।';
-        $this->log($user?->id, $request->ip(), $message, $fallback, 'unanswered', null, 'unanswered');
+        $this->log($user?->id, $ip, $message, $fallback, 'unanswered', null, 'unanswered');
 
         return response()->json([
             'ok' => true,
             'source' => 'unanswered',
             'question' => $message,
             'answer' => $fallback,
+            'usage' => $usage($used),
         ]);
     }
 

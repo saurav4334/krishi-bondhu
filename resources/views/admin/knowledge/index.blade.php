@@ -80,17 +80,26 @@
         <h3 style="margin: 0;">📝 আর্টিকেল ({{ $analytics['articles'] }})</h3>
         <a href="{{ route('admin.knowledge.articles.create') }}" class="btn btn-primary" style="padding: 6px 12px;">+ নতুন আর্টিকেল</a>
     </div>
-    <form method="GET" style="display: flex; gap: .5rem; margin-bottom: .75rem;">
-        <input type="text" name="q" value="{{ $search }}" placeholder="🔍 প্রশ্ন খুঁজুন..." style="flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
-        <button class="btn btn-secondary">খুঁজুন</button>
+    <form method="GET" style="display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: .75rem;">
+        <input type="text" name="q" value="{{ $search }}" placeholder="🔍 প্রশ্ন খুঁজুন..." style="flex: 2 1 140px; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+        <select name="category" style="flex: 1 1 110px; padding: 9px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+            <option value="">সব ক্যাটাগরি</option>
+            @foreach($categories as $c)<option value="{{ $c->id }}" {{ (int) ($filters['category'] ?? 0) === $c->id ? 'selected' : '' }}>{{ $c->name }}</option>@endforeach
+        </select>
+        <select name="source" style="flex: 1 1 110px; padding: 9px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+            <option value="">সব উৎস</option>
+            @foreach($sourceTypes as $k => $lbl)<option value="{{ $k }}" {{ ($filters['source'] ?? '') === $k ? 'selected' : '' }}>{{ $lbl }}</option>@endforeach
+        </select>
+        <button class="btn btn-secondary">ফিল্টার</button>
     </form>
     <table class="admin-table">
-        <thead><tr><th>প্রশ্ন</th><th>ক্যাটাগরি</th><th>👁️</th><th>অ্যাকশন</th></tr></thead>
+        <thead><tr><th>প্রশ্ন</th><th>ক্যাটাগরি</th><th>উৎস</th><th>👁️</th><th>অ্যাকশন</th></tr></thead>
         <tbody>
             @forelse($articles as $a)
                 <tr>
-                    <td>{{ \Illuminate\Support\Str::limit($a->question, 70) }}</td>
+                    <td>{{ \Illuminate\Support\Str::limit($a->question, 60) }}</td>
                     <td>{{ $a->category->name ?? '—' }}</td>
+                    <td style="font-size: 11px;">{{ $a->source_name ?? '—' }}</td>
                     <td>{{ $a->views_count }}</td>
                     <td class="inline-actions" style="white-space: nowrap;">
                         <a href="{{ route('admin.knowledge.articles.edit', $a) }}" title="এডিট">✏️</a>
@@ -98,7 +107,7 @@
                     </td>
                 </tr>
             @empty
-                <tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 1rem;">কোনো আর্টিকেল নেই</td></tr>
+                <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 1rem;">কোনো আর্টিকেল নেই</td></tr>
             @endforelse
         </tbody>
     </table>

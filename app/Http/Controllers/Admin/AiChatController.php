@@ -38,6 +38,8 @@ class AiChatController extends Controller
                 'today' => AiChatLog::whereDate('created_at', today())->count(),
                 'failed' => AiChatLog::where('status', 'failed')->count(),
             ],
+            'todayUsage' => AiChatLog::todayCounts(),
+            'limits' => ['user' => AiSetting::current()->daily_limit, 'guest' => AiSetting::current()->guest_limit],
         ]);
     }
 

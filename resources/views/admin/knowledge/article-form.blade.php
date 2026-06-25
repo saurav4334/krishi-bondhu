@@ -50,6 +50,28 @@
             <textarea name="answer" rows="6" required placeholder="বিস্তারিত উত্তর...">{{ old('answer', $article->answer ?? '') }}</textarea>
         </div>
 
+        <div class="grid-2" style="gap: .5rem;">
+            <div class="form-group">
+                <label>উৎসের নাম <span style="color: var(--text-muted); font-weight: 400;">(trusted source)</span></label>
+                <input type="text" name="source_name" value="{{ old('source_name', $article->source_name ?? '') }}" placeholder="যেমন: কৃষি তথ্য সার্ভিস (AIS)">
+            </div>
+            <div class="form-group">
+                <label>উৎসের ধরন</label>
+                <select name="source_type">
+                    @php $st = old('source_type', $article->source_type ?? ''); @endphp
+                    <option value="" {{ $st === '' ? 'selected' : '' }}>—</option>
+                    <option value="government" {{ $st === 'government' ? 'selected' : '' }}>সরকারি</option>
+                    <option value="research" {{ $st === 'research' ? 'selected' : '' }}>গবেষণা</option>
+                    <option value="conversational" {{ $st === 'conversational' ? 'selected' : '' }}>কথোপকথন</option>
+                    <option value="community" {{ $st === 'community' ? 'selected' : '' }}>কমিউনিটি</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label>উৎসের URL</label>
+            <input type="url" name="source_url" value="{{ old('source_url', $article->source_url ?? '') }}" placeholder="https://ais.gov.bd/">
+        </div>
+
         <div style="display: flex; gap: .5rem;">
             <a href="{{ route('admin.knowledge.index') }}" class="btn btn-secondary" style="flex: 1; justify-content: center;">বাতিল</a>
             <button type="submit" class="btn btn-primary" style="flex: 2; justify-content: center;">{{ $article ? 'আপডেট করুন' : 'তৈরি করুন' }}</button>

@@ -28,6 +28,22 @@
     <div><div class="n">{{ $stats['failed'] }}</div><div class="l">ব্যর্থ</div></div>
 </div>
 
+{{-- Today's usage breakdown (Gemini vs Knowledge Base) --}}
+<div class="card" style="background: linear-gradient(135deg, var(--green-50), #fff);">
+    <h3>📊 আজকের ব্যবহার</h3>
+    <div class="mini-stat" style="margin-bottom: .5rem;">
+        <div><div class="n">{{ $todayUsage['total'] }}</div><div class="l">মোট প্রশ্ন</div></div>
+        <div><div class="n" style="color: var(--sky-500);">{{ $todayUsage['kb'] }}</div><div class="l">জ্ঞানভান্ডার উত্তর</div></div>
+        <div><div class="n" style="color: #c77800;">{{ $todayUsage['gemini'] }}</div><div class="l">Gemini অনুরোধ</div></div>
+    </div>
+    <div style="display: flex; gap: .5rem; flex-wrap: wrap; font-size: 13px;">
+        <span class="badge badge-green">📚 KB ব্যবহার: {{ $todayUsage['kb_pct'] }}%</span>
+        <span class="badge badge-amber">🤖 Gemini ব্যবহার: {{ $todayUsage['gemini_pct'] }}%</span>
+        <span class="badge badge-sky">সীমা: ইউজার {{ $limits['user'] }} · গেস্ট {{ $limits['guest'] }} /দিন</span>
+    </div>
+    <p style="font-size: 11.5px; color: var(--text-muted); margin-top: .5rem;">দৈনিক সীমা শুধু Gemini অনুরোধে প্রযোজ্য — জ্ঞানভান্ডার উত্তর সীমাহীন। সীমা পরিবর্তন করলে সাথে সাথে কার্যকর হয়।</p>
+</div>
+
 {{-- Gemini connection / model --}}
 <div class="card">
     <h3>🔌 Gemini সংযোগ</h3>

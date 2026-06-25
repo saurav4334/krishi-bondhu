@@ -19,8 +19,8 @@ class AiSetting extends Model
     {
         return static::first() ?? static::create([
             'status' => true,
-            'daily_limit' => 10,
-            'guest_limit' => 3,
+            'daily_limit' => 50,
+            'guest_limit' => 10,
         ]);
     }
 }

@@ -34,9 +34,11 @@ class KnowledgeBaseService
             return null;
         }
 
-        // 1) Exact question match (case-insensitive).
+        // 1) Exact / greeting match — punctuation-insensitive so "কেমন আছেন",
+        //    "কেমন আছেন?" and "হ্যালো!" all hit their conversational article.
+        $norm = $this->stripPunctuation(mb_strtolower($q));
         $exact = KnowledgeArticle::active()
-            ->whereRaw('LOWER(question) = ?', [mb_strtolower($q)])
+            ->whereRaw("REPLACE(REPLACE(REPLACE(REPLACE(LOWER(TRIM(question)), '?', ''), '।', ''), '!', ''), ',', '') = ?", [$norm])
             ->first();
         if ($exact) {
             return ['article' => $exact, 'source' => 'exact', 'score' => 100];
@@ -96,6 +98,12 @@ class KnowledgeBaseService
     public function recordView(KnowledgeArticle $article): void
     {
         $article->increment('views_count');
+    }
+
+    /** Strip trailing/embedded sentence punctuation for exact-match normalization. */
+    private function stripPunctuation(string $text): string
+    {
+        return trim(str_replace(['?', '।', '!', ','], '', $text));
     }
 
     /** Split into meaningful search tokens (length >= 2, no stopwords). */

@@ -1,4 +1,10 @@
 {{-- কৃষি AI সহকারী — floating chatbot (shown on all authenticated/farmer pages) --}}
+@php
+    // Live values — read from AiSetting so an admin change applies immediately.
+    $aiSettings = \App\Models\AiSetting::current();
+    $aiLimit = auth()->check() ? $aiSettings->daily_limit : $aiSettings->guest_limit;
+    $aiUsed = \App\Models\AiChatLog::geminiUsedToday(auth()->id(), request()->ip());
+@endphp
 <style>
     #ai-fab { position: fixed; right: 16px; bottom: calc(60px + 16px); z-index: 1100; display: inline-flex; align-items: center; gap: 7px;
         background: var(--green-500); color: #fff; border-radius: 999px; padding: 11px 16px; font-size: 14px; font-weight: 600;
@@ -14,9 +20,12 @@
     #ai-head { background: var(--green-600); color: #fff; padding: 12px 14px; display: flex; align-items: center; gap: 8px; }
     #ai-head h4 { font-family: 'Noto Serif Bengali', serif; font-size: 15px; font-weight: 600; flex: 1; }
     #ai-head button { background: rgba(255,255,255,.18); color: #fff; border: none; width: 28px; height: 28px; border-radius: 7px; font-size: 16px; line-height: 1; }
+    #ai-usage { background: var(--green-50); border-bottom: 1px solid var(--border); color: var(--green-700); font-size: 11.5px; padding: 5px 12px; }
+    #ai-usage strong { color: var(--green-600); }
     #ai-body { flex: 1; overflow-y: auto; padding: 12px; background: var(--bg); display: flex; flex-direction: column; gap: 9px; }
     .ai-msg { max-width: 86%; padding: 9px 12px; border-radius: 12px; font-size: 14px; line-height: 1.55; white-space: pre-wrap; word-break: break-word; }
     .ai-bot { align-self: flex-start; background: var(--card); border: 1px solid var(--border); border-bottom-left-radius: 3px; color: var(--text-primary); }
+    .ai-source { margin-top: 6px; font-size: 10.5px; color: var(--green-600); opacity: .85; border-top: 1px dashed var(--border); padding-top: 4px; }
     .ai-user { align-self: flex-end; background: var(--green-500); color: #fff; border-bottom-right-radius: 3px; }
     .ai-err { align-self: flex-start; background: var(--red-50); border: 1px solid var(--red-100); color: var(--red-500); }
     .ai-typing { align-self: flex-start; display: inline-flex; gap: 4px; padding: 11px 13px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; }
@@ -40,6 +49,7 @@
         <h4>কৃষি AI সহকারী</h4>
         <button type="button" title="ছোট করুন" onclick="aiToggle(false)">—</button>
     </div>
+    <div id="ai-usage">আজকের AI ব্যবহার: <strong id="ai-used">{{ $aiUsed }}</strong> / <strong id="ai-limit">{{ $aiLimit }}</strong> <span style="opacity:.7;">(শুধু AI প্রশ্ন; জ্ঞানভান্ডার উত্তর সীমাহীন)</span></div>
     <div id="ai-body">
         <div class="ai-msg ai-bot">আসসালামু আলাইকুম! 👋 আমি কৃষি-বন্ধুর AI সহকারী। ফসল, সার, বীজ, কীটনাশক, সেচ বা বাজার দর সম্পর্কে আপনার প্রশ্ন লিখুন — আমি সহজ বাংলায় উত্তর দেব।</div>
     </div>
@@ -78,10 +88,16 @@
             if (open) setTimeout(function () { input.focus(); }, 50);
         };
 
-        function bubble(text, cls) {
+        function bubble(text, cls, sourceLabel) {
             var d = document.createElement('div');
             d.className = 'ai-msg ' + cls;
             d.textContent = text;
+            if (sourceLabel) {
+                var s = document.createElement('div');
+                s.className = 'ai-source';
+                s.textContent = 'উৎস: ' + sourceLabel;
+                d.appendChild(s);
+            }
             body.appendChild(d);
             body.scrollTop = body.scrollHeight;
             return d;
@@ -118,8 +134,13 @@
                 return r.json().then(function (data) { return { ok: r.ok, status: r.status, data: data }; });
             }).then(function (res) {
                 t.remove();
+                // Update today's AI usage (Gemini only) — limit reflects current admin setting.
+                if (res.data && res.data.usage) {
+                    document.getElementById('ai-used').textContent = res.data.usage.used;
+                    document.getElementById('ai-limit').textContent = res.data.usage.limit;
+                }
                 if (res.ok && res.data.ok && res.data.answer) {
-                    bubble(res.data.answer, 'ai-bot');
+                    bubble(res.data.answer, 'ai-bot', res.data.source_label);
                 } else {
                     // Detailed backend error (invalid key / model not found / rate limit / timeout)
                     bubble(res.data.answer || res.data.message || 'দুঃখিত, এখন উত্তর দেওয়া যাচ্ছে না। কিছুক্ষণ পরে আবার চেষ্টা করুন।', 'ai-err');

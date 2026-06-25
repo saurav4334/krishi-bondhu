@@ -12,6 +12,17 @@
     <h2 class="page-title" style="margin: .6rem 0; border: none; padding: 0;">{{ $article->question }}</h2>
     <div style="font-size: 15px; line-height: 1.7; color: var(--text-primary); white-space: pre-line;">{{ $article->answer }}</div>
 
+    @if($article->source_name)
+        <div style="margin-top: .85rem; font-size: 12px; color: var(--green-600);">
+            📚 উৎস:
+            @if($article->source_url)
+                <a href="{{ $article->source_url }}" target="_blank" rel="noopener" style="color: var(--green-600); text-decoration: underline;">{{ $article->source_name }}</a>
+            @else
+                {{ $article->source_name }}
+            @endif
+        </div>
+    @endif
+
     <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--border);">
         <span style="font-size: 12px; color: var(--text-muted);">👁️ {{ $article->views_count }} বার দেখা · 👍 {{ $article->helpful_count }}</span>
         <form method="POST" action="{{ route('knowledge.helpful', $article) }}" style="margin-left: auto;">

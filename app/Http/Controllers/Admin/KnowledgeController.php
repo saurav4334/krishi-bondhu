@@ -19,7 +19,9 @@ class KnowledgeController extends Controller
         $search = trim((string) $request->input('q'));
 
         $articles = KnowledgeArticle::with('category')
-            ->when($search, fn ($qr) => $qr->where('question', 'like', "%{$search}%")->orWhere('title', 'like', "%{$search}%"))
+            ->when($search, fn ($qr) => $qr->where(fn ($w) => $w->where('question', 'like', "%{$search}%")->orWhere('title', 'like', "%{$search}%")))
+            ->when($request->category, fn ($qr, $c) => $qr->where('category_id', $c))
+            ->when($request->source, fn ($qr, $s) => $qr->where('source_type', $s))
             ->latest()
             ->paginate(15)
             ->withQueryString();
@@ -32,6 +34,8 @@ class KnowledgeController extends Controller
             'categories' => KnowledgeCategory::withCount('articles')->orderBy('sort_order')->get(),
             'articles' => $articles,
             'search' => $search,
+            'filters' => ['category' => $request->category, 'source' => $request->source],
+            'sourceTypes' => ['government' => 'সরকারি', 'research' => 'গবেষণা', 'conversational' => 'কথোপকথন', 'community' => 'কমিউনিটি'],
             'unanswered' => UnansweredQuestion::pending()->with('user:id,name')->latest()->take(30)->get(),
             'analytics' => [
                 'total' => $total,
@@ -146,11 +150,15 @@ class KnowledgeController extends Controller
             'question' => ['required', 'string', 'max:500'],
             'keywords' => ['nullable', 'string', 'max:300'],
             'answer' => ['required', 'string', 'max:4000'],
+            'source_name' => ['nullable', 'string', 'max:120'],
+            'source_url' => ['nullable', 'url', 'max:255'],
+            'source_type' => ['nullable', 'in:government,research,conversational,community'],
             'status' => ['required', 'in:active,inactive'],
         ], [
             'title.required' => 'শিরোনাম দিন',
             'question.required' => 'প্রশ্ন দিন',
             'answer.required' => 'উত্তর দিন',
+            'source_url.url' => 'সঠিক URL দিন',
         ]);
     }
 
