@@ -81,7 +81,7 @@
         <div class="scan-hist-item">
             <div class="scan-thumb">
                 @if($scan->image)
-                    <img src="{{ asset('storage/' . $scan->image) }}" alt="">
+                    <img src="{{ image_url($scan->image, 'images/default.png') }}" alt="" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';">
                 @else
                     🌿
                 @endif

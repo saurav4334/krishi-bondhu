@@ -95,7 +95,7 @@
 <body>
     {{-- Splash screen (shown once per browser session) --}}
     <div id="splash">
-        <img class="splash-logo" src="{{ asset('images/logo.png') }}" alt="কৃষি-বন্ধু — কৃষকের ডিজিটাল সহায়ক">
+        <img class="splash-logo" src="{{ image_url('images/logo.png', 'images/default.png') }}" alt="কৃষি-বন্ধু — কৃষকের ডিজিটাল সহায়ক" onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';">
     </div>
     <script>
         (function () {

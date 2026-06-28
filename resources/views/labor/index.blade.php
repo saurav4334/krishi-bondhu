@@ -63,7 +63,7 @@
     <div class="worker-card">
         <div class="worker-avatar">
             @if($worker->image)
-                <img src="{{ asset('storage/' . $worker->image) }}" alt="">
+                <img src="{{ image_url($worker->image, 'images/default.png') }}" alt="" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';">
             @else
                 {{ mb_substr($worker->name, 0, 1) }}
             @endif

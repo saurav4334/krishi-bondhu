@@ -120,7 +120,7 @@
         @foreach($latestNews as $news)
             <a href="{{ route('news.show', $news) }}" class="scan-hist-item" style="color: inherit;">
                 <div class="scan-thumb">
-                    @if($news->image)<img src="{{ asset('storage/' . $news->image) }}" alt="">@else 📰 @endif
+                    @if($news->image)<img src="{{ image_url($news->image, 'images/news/default.jpg') }}" alt="" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">@else 📰 @endif
                 </div>
                 <div class="info" style="flex: 1;">
                     <h4>{{ $news->title }}</h4>
@@ -139,7 +139,7 @@
             <div class="scan-hist-item">
                 <div class="scan-thumb">
                     @if($scan->image)
-                        <img src="{{ asset('storage/' . $scan->image) }}" alt="">
+                        <img src="{{ image_url($scan->image, 'images/default.png') }}" alt="" loading="lazy" onerror="this.onerror=null; this.src='{{ asset('images/default.png') }}';">
                     @else
                         🌿
                     @endif

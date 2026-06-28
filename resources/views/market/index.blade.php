@@ -69,7 +69,8 @@
         </div>
 
         @if($post->image)
-            <img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->crop_name }}" class="post-image" loading="lazy">
+            <img src="{{ image_url($post->image, 'images/no-product.png') }}" alt="{{ $post->crop_name }}" class="post-image" loading="lazy"
+                 onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
         @endif
 
         <div class="post-body">
