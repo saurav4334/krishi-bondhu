@@ -29,17 +29,24 @@
     </a>
 @endforeach
 
+<form method="GET" style="display: flex; gap: .5rem; margin-bottom: .85rem;">
+    @if($activeCategory)<input type="hidden" name="category" value="{{ $activeCategory }}">@endif
+    <input type="text" name="q" value="{{ $search ?? '' }}" placeholder="🔍 সংবাদ খুঁজুন..." style="flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm);">
+    <button type="submit" class="btn btn-primary">খুঁজুন</button>
+</form>
+
 <div class="chips">
-    <a href="{{ route('news.index') }}" class="chip {{ empty($activeCategory) ? 'active' : '' }}">সব</a>
+    <a href="{{ route('news.index', array_filter(['q' => $search ?? null])) }}" class="chip {{ empty($activeCategory) ? 'active' : '' }}">সব</a>
     @foreach($categories as $cat)
-        <a href="{{ route('news.index', ['category' => $cat->slug]) }}" class="chip {{ $activeCategory === $cat->slug ? 'active' : '' }}">{{ $cat->name }}</a>
+        <a href="{{ route('news.index', array_merge(array_filter(['q' => $search ?? null]), ['category' => $cat->slug])) }}" class="chip {{ $activeCategory === $cat->slug ? 'active' : '' }}">{{ $cat->name }}</a>
     @endforeach
 </div>
 
 @forelse($posts as $post)
     <a href="{{ route('news.show', $post) }}" class="news-card">
         <div class="thumb">
-            @if($post->image)<img src="{{ asset('storage/' . $post->image) }}" alt="" loading="lazy">@else 📰 @endif
+            <img src="{{ $post->image_url }}" alt="" loading="lazy"
+                 onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">
         </div>
         <div class="body">
             <div class="meta">

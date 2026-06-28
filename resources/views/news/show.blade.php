@@ -13,15 +13,17 @@
 <a href="{{ route('news.index') }}" class="btn btn-secondary" style="margin-bottom: 1rem;">← সংবাদে ফিরুন</a>
 
 <div class="card">
-    @if($post->image)<img src="{{ asset('storage/' . $post->image) }}" alt="{{ $post->title }}" class="article-img">@endif
+    <img src="{{ $post->image_url }}" alt="{{ $post->title }}" class="article-img" loading="lazy"
+         onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">
     <div class="article-meta">
         <span class="badge badge-green">{{ $post->category->name ?? '' }}</span>
         @if($post->is_important)<span class="badge badge-red">গুরুত্বপূর্ণ</span>@endif
         @if($post->district)<span class="badge badge-sky">📍 {{ $post->district }}</span>@endif
     </div>
     <h2 style="font-size: 1.3rem; color: var(--green-700); margin-bottom: .35rem;">{{ $post->title }}</h2>
-    <time style="font-size: 12px; color: var(--text-muted);">{{ optional($post->published_at)->translatedFormat('d F Y') ?? $post->created_at->translatedFormat('d F Y') }}</time>
-    <div class="article-body" style="margin-top: 1rem;">{{ $post->description }}</div>
+    <time style="font-size: 12px; color: var(--text-muted);">{{ optional($post->published_at)->translatedFormat('d F Y') ?? $post->created_at->translatedFormat('d F Y') }} · 👁️ {{ $post->views_count }}</time>
+    @if($post->description)<p style="font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-top: .75rem;">{{ $post->description }}</p>@endif
+    <div class="article-body" style="margin-top: 1rem;">{{ $post->content ?: $post->description }}</div>
 </div>
 
 @if($related->isNotEmpty())

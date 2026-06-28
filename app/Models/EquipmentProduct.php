@@ -30,12 +30,14 @@ class EquipmentProduct extends Model
         'status',
         'featured',
         'approved',
+        'is_demo',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'featured' => 'boolean',
         'approved' => 'boolean',
+        'is_demo' => 'boolean',
     ];
 
     public const CONDITIONS = [

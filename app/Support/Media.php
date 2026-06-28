@@ -19,9 +19,9 @@ use Illuminate\Support\Facades\Storage;
  */
 class Media
 {
-    public static function url(?string $path): string
+    public static function url(?string $path, string $fallback = 'images/no-product.png'): string
     {
-        $placeholder = asset('images/no-product.png');
+        $placeholder = asset($fallback);
 
         if (empty(trim((string) $path))) {
             return $placeholder;

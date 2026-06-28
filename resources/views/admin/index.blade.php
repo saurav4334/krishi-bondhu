@@ -33,6 +33,22 @@
     <a href="{{ route('admin.knowledge.index') }}" class="btn btn-secondary" style="justify-content: center;">📚 জ্ঞানভান্ডার</a>
 </div>
 
+{{-- Demo data generators (for presentation) --}}
+<div class="card">
+    <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .35rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">🎬 ডেমো ডেটা জেনারেটর</h3>
+    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: .6rem;">উপস্থাপনার জন্য নমুনা ডেটা তৈরি করুন। শুধু ডেমো ডেটা পুনরায় তৈরি হয়; বাস্তব/ম্যানুয়াল ডেটা অক্ষুণ্ন থাকে।</p>
+    <div class="grid-2" style="gap: .5rem;">
+        <form method="POST" action="{{ route('admin.demo.equipment') }}" onsubmit="return confirm('৬০+ কৃষি সরঞ্জাম ডেমো পণ্য তৈরি করবেন?')">
+            @csrf
+            <button type="submit" class="btn btn-primary btn-block">🚜 Equipment ডেমো তৈরি করুন</button>
+        </form>
+        <form method="POST" action="{{ route('admin.demo.news') }}" onsubmit="return confirm('৫০+ কৃষি সংবাদ ডেমো তৈরি করবেন?')">
+            @csrf
+            <button type="submit" class="btn btn-primary btn-block">📰 News ডেমো তৈরি করুন</button>
+        </form>
+    </div>
+</div>
+
 <div class="card">
     <h3 style="font-size: 1rem; color: var(--green-700); margin-bottom: .75rem; font-family: 'Hind Siliguri', sans-serif; font-weight: 600;">📢 বিজ্ঞপ্তি পাঠান</h3>
     <form method="POST" action="{{ route('admin.notifications.store') }}">

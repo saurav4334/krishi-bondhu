@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AiChatController as AdminAiChatController;
+use App\Http\Controllers\Admin\DemoController as AdminDemoController;
 use App\Http\Controllers\Admin\EquipmentController as AdminEquipmentController;
 use App\Http\Controllers\Admin\KnowledgeController as AdminKnowledgeController;
 use App\Http\Controllers\Admin\MarketplaceController as AdminMarketplaceController;
@@ -136,6 +137,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('index');
         Route::post('/notifications', [AdminController::class, 'storeNotification'])->name('notifications.store');
+
+        // Demo-data generators (for presentation)
+        Route::post('/demo/equipment', [AdminDemoController::class, 'equipment'])->name('demo.equipment');
+        Route::post('/demo/news', [AdminDemoController::class, 'news'])->name('demo.news');
         Route::post('/prices', [AdminController::class, 'storePrice'])->name('prices.store');
         Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('users.delete');
 

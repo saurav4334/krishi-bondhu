@@ -13,11 +13,17 @@ class NewsController extends Controller
     public function index(Request $request): View
     {
         $userDistrict = Auth::user()->district;
+        $search = trim((string) $request->input('q'));
 
         $posts = NewsPost::published()
             ->with('category')
             ->when($request->category, function ($q, $slug) {
                 $q->whereHas('category', fn ($c) => $c->where('slug', $slug));
+            })
+            ->when($search, function ($q) use ($search) {
+                $q->where(fn ($w) => $w->where('title', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%"));
             })
             ->where(fn ($q) => $q->whereNull('district')->orWhere('district', $userDistrict))
             ->orderByDesc('is_important')
@@ -38,6 +44,7 @@ class NewsController extends Controller
             'categories' => NewsCategory::orderBy('name')->get(),
             'important' => $important,
             'activeCategory' => $request->category,
+            'search' => $search,
         ]);
     }
 
@@ -45,6 +52,7 @@ class NewsController extends Controller
     {
         abort_unless($post->status === 'published', 404);
 
+        $post->increment('views_count');
         $post->load('category');
 
         $related = NewsPost::published()
