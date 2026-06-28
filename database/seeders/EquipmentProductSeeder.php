@@ -30,10 +30,12 @@ class EquipmentProductSeeder extends Seeder
             ['পাবনা', 'সদর'], ['খুলনা', 'ডুমুরিয়া'], ['টাঙ্গাইল', 'ঘাটাইল'], ['জামালপুর', 'সদর'],
         ];
 
+        $files = $this->imageFiles();
         $i = 0;
         foreach ($this->products() as $p) {
             [$dist, $upz] = $districts[$i % count($districts)];
             $mobile = '017300' . str_pad((string) ($i + 1), 5, '0', STR_PAD_LEFT);
+            $img = $files[$i] ?? 'default'; // unique real photo per product (same order as products())
             $i++;
 
             EquipmentProduct::updateOrCreate(
@@ -52,7 +54,7 @@ class EquipmentProductSeeder extends Seeder
                     'mobile' => $mobile,
                     'whatsapp' => $mobile,
                     'description' => $p['desc'],
-                    'image' => 'images/equipment/' . $p['img'] . '.jpg',
+                    'image' => 'images/equipment/' . $img . '.jpg',
                     'status' => 'active',
                     'approved' => true,
                     'featured' => $p['feat'] ?? false,
@@ -140,6 +142,25 @@ class EquipmentProductSeeder extends Seeder
             ['name' => 'সেচ পাম্প ভাড়া সার্ভিস', 'sub' => 'pump-rental', 'img' => 'service', 'brand' => null, 'model' => null, 'price' => 800, 'stock' => null, 'unit' => 'দিন', 'cond' => null, 'feat' => false, 'desc' => 'সেচের জন্য পাম্প ভাড়া, দৈনিক হিসেবে।'],
             ['name' => 'স্প্রে সার্ভিস (ড্রোন)', 'sub' => 'spray-service', 'img' => 'service', 'brand' => null, 'model' => null, 'price' => 400, 'stock' => null, 'unit' => 'বিঘা', 'cond' => null, 'feat' => false, 'desc' => 'ড্রোন/মেশিনে কীটনাশক স্প্রে সার্ভিস, বিঘা হিসেবে।'],
             ['name' => 'কৃষি পণ্য পরিবহন সেবা', 'sub' => 'transport-service', 'img' => 'service', 'brand' => null, 'model' => null, 'price' => 25, 'stock' => null, 'unit' => 'কিমি', 'cond' => null, 'feat' => false, 'desc' => 'ফসল ও কৃষি পণ্য পরিবহনের সেবা, কিমি হিসেবে।'],
+        ];
+    }
+
+    /** Unique real photo per product (same order as products()). Files in public/images/equipment/. */
+    private function imageFiles(): array
+    {
+        return [
+            'mahindra-tractor', 'sonalika-tractor', 'yanmar-power-tiller', 'aci-power-tiller', 'mini-tractor',
+            'combine-harvester', 'reaper-harvester', 'paddy-thresher', 'wheat-thresher', 'rotavator',
+            'seed-drill', 'rice-transplanter', 'diesel-pump', 'electric-pump', 'submersible-pump',
+            'battery-sprayer', 'power-sprayer', 'hand-sprayer', 'drip-irrigation', 'sprinkler',
+            'brri-rice-seed', 'brri-rice-seed2', 'hybrid-maize-seed', 'tomato-seed', 'chili-seed',
+            'mustard-seed', 'brinjal-seed', 'vegetable-seed', 'urea-fertilizer', 'tsp-fertilizer',
+            'dap-fertilizer', 'mop-fertilizer', 'vermicompost', 'organic-compost', 'liquid-fertilizer',
+            'micronutrient', 'insecticide', 'fungicide', 'herbicide', 'bio-pesticide',
+            'rodent-control', 'hoe', 'sickle', 'shovel', 'axe',
+            'gloves', 'gumboot', 'hose-pipe', 'pvc-pipe', 'cattle-feed',
+            'goat-feed', 'poultry-feed', 'broiler-chick', 'fish-feed', 'pond-medicine',
+            'tractor-rent', 'harvester-rent', 'pump-rent', 'drone-spray', 'transport',
         ];
     }
 }

@@ -11,9 +11,11 @@
     .chips.sub .chip.active { background: var(--amber-400); color: #5a3e00; border-color: var(--amber-400); }
     .filter-row { display: flex; gap: .5rem; margin-bottom: 1rem; }
     .filter-row input, .filter-row select { flex: 1; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); background: #fff; font-size: 14px; min-width: 0; }
-    .prod-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; box-shadow: var(--shadow); position: relative; }
+    .prod-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 1rem; box-shadow: var(--shadow); position: relative; transition: transform .2s ease, box-shadow .2s ease; }
+    .prod-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
     .prod-card .featured-tag { position: absolute; top: 10px; left: 10px; background: var(--amber-400); color: #5a3e00; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 999px; z-index: 2; }
-    .prod-image { width: 100%; height: 190px; object-fit: cover; background: var(--green-50); display: block; }
+    .prod-image { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; background: var(--green-50); display: block; transition: transform .35s ease; }
+    .prod-card:hover .prod-image { transform: scale(1.05); }
     .prod-image-ph { width: 100%; height: 190px; background: var(--green-50); display: flex; align-items: center; justify-content: center; font-size: 3rem; }
     .prod-body { padding: .85rem 1rem 1rem; }
     .prod-title { font-size: 1.1rem; color: var(--green-700); margin-bottom: .35rem; }
