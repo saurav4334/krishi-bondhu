@@ -40,7 +40,7 @@
         <div class="form-group">
             <label>ফিচার্ড ছবি</label>
             <input type="file" name="image" accept="image/jpeg,image/png,image/webp" style="padding: 6px;">
-            @if($post->image)<img src="{{ image_url($post->image, 'images/news/default.jpg') }}" alt="" style="margin-top: .5rem; height: 70px; border-radius: 8px;" onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">@endif
+            @if($post->image)<img src="{{ safe_image_url($post->image, 'images/news/default.jpg') }}" alt="" style="margin-top: .5rem; height: 70px; border-radius: 8px;" onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">@endif
         </div>
 
         <div class="grid-2" style="gap: .5rem;">

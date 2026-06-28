@@ -13,7 +13,7 @@
 <a href="{{ route('news.index') }}" class="btn btn-secondary" style="margin-bottom: 1rem;">← সংবাদে ফিরুন</a>
 
 <div class="card">
-    <img src="{{ $post->image_url }}" alt="{{ $post->title }}" class="article-img" loading="lazy"
+    <img src="{{ safe_image_url($post->image, 'images/news/default.jpg') }}" alt="{{ $post->title }}" class="article-img" loading="lazy"
          onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">
     <div class="article-meta">
         <span class="badge badge-green">{{ $post->category->name ?? '' }}</span>

@@ -45,7 +45,7 @@
 @forelse($posts as $post)
     <a href="{{ route('news.show', $post) }}" class="news-card">
         <div class="thumb">
-            <img src="{{ $post->image_url }}" alt="" loading="lazy"
+            <img src="{{ safe_image_url($post->image, 'images/news/default.jpg') }}" alt="" loading="lazy"
                  onerror="this.onerror=null; this.src='{{ asset('images/news/default.jpg') }}';">
         </div>
         <div class="body">

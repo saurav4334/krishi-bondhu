@@ -30,13 +30,13 @@
 
 <div class="card">
     {{-- Image gallery --}}
-    <img id="galleryMain" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="gallery-main" loading="lazy"
-         onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
+    <img id="galleryMain" src="{{ safe_image_url($product->image, 'images/equipment/default.jpg') }}" alt="{{ $product->name }}" class="gallery-main" loading="lazy"
+         onerror="this.onerror=null; this.src='{{ asset('images/equipment/default.jpg') }}';">
     @if($product->images->count() > 1)
         <div class="thumbs">
             @foreach($product->images as $img)
-                <img src="{{ $img->url }}" alt="" loading="lazy" class="{{ $loop->first ? 'active' : '' }}" onclick="eqSwap(this)"
-                     onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
+                <img src="{{ safe_image_url($img->image, 'images/equipment/default.jpg') }}" alt="" loading="lazy" class="{{ $loop->first ? 'active' : '' }}" onclick="eqSwap(this)"
+                     onerror="this.onerror=null; this.src='{{ asset('images/equipment/default.jpg') }}';">
             @endforeach
         </div>
     @endif

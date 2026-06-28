@@ -2,6 +2,24 @@
 
 use App\Support\Media;
 
+if (! function_exists('safe_image_url')) {
+    /**
+     * Canonical safe image-URL resolver. Returns a working URL on any host for
+     * every stored format:
+     *   - full https URL                  → as-is
+     *   - public/images/… or images/…     → asset(...)
+     *   - uploads/…                       → asset(...)
+     *   - storage/… (public disk)         → /media route (no symlink needed)
+     *   - null / missing file             → $fallback placeholder
+     *
+     * Blade: {{ safe_image_url($item->image, 'images/equipment/default.jpg') }}
+     */
+    function safe_image_url(?string $path, string $fallback = 'images/default.png'): string
+    {
+        return \App\Support\Media::url($path, $fallback);
+    }
+}
+
 if (! function_exists('image_url')) {
     /**
      * Global image-URL resolver for Blade. Returns a working URL on any host
