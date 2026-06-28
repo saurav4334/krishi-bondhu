@@ -186,6 +186,7 @@ class DatabaseSeeder extends Seeder
             WeatherAlertSeeder::class,
             VoiceTemplateSeeder::class,
             KnowledgeBaseSeeder::class,
+            DemoContentSeeder::class,
         ]);
 
         $this->command->info('');
