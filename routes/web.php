@@ -13,6 +13,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\KnowledgeController;
+use App\Http\Controllers\MediaController;
 use App\Http\Controllers\EquipmentController;
 use App\Http\Controllers\ExpertController;
 use App\Http\Controllers\LaborController;
@@ -34,6 +35,9 @@ Route::get('/', function () {
 
 // Public Protiddhoni IVR DTMF webhook (machine-to-machine, CSRF-exempt). No auth.
 Route::post('/voice/callback', [VoiceCallbackController::class, 'handle'])->name('voice.callback');
+
+// Public media streamer — serves storage/app/public files without a symlink (cPanel-safe).
+Route::get('/media/{path}', [MediaController::class, 'show'])->where('path', '.+')->name('media.show');
 
 // Guest routes
 Route::middleware('guest')->group(function () {

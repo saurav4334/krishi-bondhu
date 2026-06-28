@@ -54,11 +54,7 @@ class EquipmentProduct extends Model
      */
     public function getImageUrlAttribute(): string
     {
-        if ($this->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
-        }
-
-        return asset('images/no-product.png');
+        return \App\Support\Media::url($this->image);
     }
 
     /** WhatsApp falls back to the primary mobile when not provided. */

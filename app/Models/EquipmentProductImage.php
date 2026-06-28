@@ -9,14 +9,10 @@ class EquipmentProductImage extends Model
 {
     protected $fillable = ['equipment_product_id', 'image'];
 
-    /** Resolved gallery image URL (public-disk file when present, else placeholder). */
+    /** Resolved gallery image URL (handles storage/public/full-URL paths + placeholder). */
     public function getUrlAttribute(): string
     {
-        if ($this->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
-            return asset('storage/' . $this->image);
-        }
-
-        return asset('images/no-product.png');
+        return \App\Support\Media::url($this->image);
     }
 
     public function product(): BelongsTo
