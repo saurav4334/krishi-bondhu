@@ -30,17 +30,15 @@
 
 <div class="card">
     {{-- Image gallery --}}
-    @if($product->images->count())
-        <img id="galleryMain" src="{{ asset('storage/' . ($product->image ?: $product->images->first()->image)) }}" alt="{{ $product->name }}" class="gallery-main">
-        @if($product->images->count() > 1)
-            <div class="thumbs">
-                @foreach($product->images as $img)
-                    <img src="{{ asset('storage/' . $img->image) }}" alt="" class="{{ $loop->first ? 'active' : '' }}" onclick="eqSwap(this)">
-                @endforeach
-            </div>
-        @endif
-    @else
-        <div class="gallery-main-ph">{{ $product->category->icon ?? '🚜' }}</div>
+    <img id="galleryMain" src="{{ $product->image_url }}" alt="{{ $product->name }}" class="gallery-main" loading="lazy"
+         onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
+    @if($product->images->count() > 1)
+        <div class="thumbs">
+            @foreach($product->images as $img)
+                <img src="{{ $img->url }}" alt="" loading="lazy" class="{{ $loop->first ? 'active' : '' }}" onclick="eqSwap(this)"
+                     onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
+            @endforeach
+        </div>
     @endif
 
     {{-- Category breadcrumb --}}

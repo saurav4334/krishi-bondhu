@@ -48,6 +48,19 @@ class EquipmentProduct extends Model
         return $this->condition ? (self::CONDITIONS[$this->condition] ?? $this->condition) : null;
     }
 
+    /**
+     * Resolved thumbnail URL — the stored public-disk image when it exists,
+     * otherwise the placeholder. Works on localhost and shared cPanel hosting.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        if ($this->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($this->image)) {
+            return asset('storage/' . $this->image);
+        }
+
+        return asset('images/no-product.png');
+    }
+
     /** WhatsApp falls back to the primary mobile when not provided. */
     public function getWhatsappNumberAttribute(): string
     {

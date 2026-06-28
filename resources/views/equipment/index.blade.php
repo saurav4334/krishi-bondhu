@@ -71,11 +71,8 @@
         @if($product->featured)<span class="featured-tag">⭐ ফিচার্ড</span>@endif
 
         <a href="{{ route('equipment.show', $product) }}">
-            @if($product->image)
-                <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}" class="prod-image" loading="lazy">
-            @else
-                <div class="prod-image-ph">{{ $product->category->icon ?? '🚜' }}</div>
-            @endif
+            <img src="{{ $product->image_url }}" alt="{{ $product->name }}" class="prod-image" loading="lazy"
+                 onerror="this.onerror=null; this.src='{{ asset('images/no-product.png') }}';">
         </a>
 
         <div class="prod-body">
